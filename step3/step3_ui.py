@@ -52,5 +52,5 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
         layout.label("Hi-res Model Prep")
         layout.operator("assign_decimate.btn", text="Assign Decimate")
         layout.operator("apply_decimate.btn", text="Apply Decimate")
-        layout.operator("add_sufix.btn", text="Triangulate").sufix = "_High"
-        layout.operator("add_sufix.btn", text="Triangulate").sufix = "_High"
+        layout.operator("add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
+        layout.operator("add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
