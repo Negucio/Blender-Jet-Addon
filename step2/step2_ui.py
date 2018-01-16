@@ -32,6 +32,12 @@ class VIEW3D_PT_jet_step2(bpy.types.Panel):
     def poll(cls, context):
         return True
 
+    def arrange_uvs(self, layout):
+        layout.operator("uv.average_islands_scale", text="Average Islands Scale")
+        layout.operator("uv.pack_islands", text="Pack Islands")
+        layout.operator("scene.ms_remove_other_uv", text="Remove Other UVs")
+        layout.label("Shotpacker??")
+
     def texture_atlas(self, layout):
         if not is_texture_atlas_enabled():
             layout.label("Texture Atlas is not enabled", icon="ERROR")
@@ -39,13 +45,12 @@ class VIEW3D_PT_jet_step2(bpy.types.Panel):
         else:
             layout.operator("scene.ms_add_lightmap_group", text="Start Texture Atlas").name = "TextureAtlas_Jet"
             layout.operator("object.ms_run", text="Start Manual Unwrap")
-            layout.operator("uv.average_islands_scale", text="Average Islands Scale")
-            layout.operator("uv.pack_islands", text="Pack Islands")
-            layout.label("Shotpacker??")
+            self.arrange_uvs(layout)
             layout.operator("object.ms_run_remove", text="Finish Manual Unwrap")
 
     def draw(self, context):
         layout = self.layout
+        layout.enabled = len(context.selected_objects)>0
         layout.label("UVs completas")
 
         self.texture_atlas(layout)
