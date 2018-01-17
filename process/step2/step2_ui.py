@@ -1,27 +1,8 @@
 import bpy
-from .. common_utils import ApplyToSelected
+from ... common_utils import apply_to_selected, any_mesh_obj_selected
 from . step2_utils import triangulate, is_texture_atlas_enabled, enable_texture_atlas
 
-class VIEW3D_OT_jet_triangulate(bpy.types.Operator):
-    bl_idname = "jet_triangulate.btn"
-    bl_label = "Triangulate"
-    bl_description = "Triangulate"
-
-    def execute(self, context):
-        ApplyToSelected(context, triangulate)
-        return {'FINISHED'}
-
-
-class VIEW3D_OT_jet_texture_atlas_on(bpy.types.Operator):
-    bl_idname = "jet_texture_atlas_on.btn"
-    bl_label = "EnableTextureAtlas"
-    bl_description = "Enable Texture Atlas Addon"
-
-    def execute(self, context):
-        enable_texture_atlas()
-        return {'FINISHED'}
-
-
+#Panel
 class VIEW3D_PT_jet_step2(bpy.types.Panel):
     bl_label = "Step 2"
     bl_space_type = 'VIEW_3D'
@@ -30,7 +11,7 @@ class VIEW3D_PT_jet_step2(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return True
+        return any_mesh_obj_selected
 
     def arrange_uvs(self, layout):
         layout.operator("uv.average_islands_scale", text="Average Islands Scale")
@@ -56,3 +37,26 @@ class VIEW3D_PT_jet_step2(bpy.types.Panel):
         self.texture_atlas(layout)
 
         layout.operator("jet_triangulate.btn", text="Triangulate")
+
+
+#Operators
+class VIEW3D_OT_jet_triangulate(bpy.types.Operator):
+    bl_idname = "jet_triangulate.btn"
+    bl_label = "Triangulate"
+    bl_description = "Triangulate"
+
+    def execute(self, context):
+        apply_to_selected(context, triangulate)
+        return {'FINISHED'}
+
+
+class VIEW3D_OT_jet_texture_atlas_on(bpy.types.Operator):
+    bl_idname = "jet_texture_atlas_on.btn"
+    bl_label = "EnableTextureAtlas"
+    bl_description = "Enable Texture Atlas Addon"
+
+    def execute(self, context):
+        enable_texture_atlas()
+        return {'FINISHED'}
+
+

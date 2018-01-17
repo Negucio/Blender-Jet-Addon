@@ -1,6 +1,6 @@
 import bpy
 
-
+#Panel
 class VIEW3D_PT_jet_step6(bpy.types.Panel):
     bl_label = "Step 6"
     bl_space_type = 'VIEW_3D'
@@ -14,3 +14,7 @@ class VIEW3D_PT_jet_step6(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         layout.label("Cages")
+
+
+#Operators
+

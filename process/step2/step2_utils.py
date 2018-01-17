@@ -1,5 +1,5 @@
 import bpy, bmesh
-from .. common_utils import SelectObjectExclusive
+from ... common_utils import select_obj_exclusive
 from addon_utils import check, enable, modules_refresh
 
 def is_texture_atlas_enabled():
@@ -14,7 +14,7 @@ def enable_texture_atlas():
 
 def triangulate(obj):
     if obj == None or obj.type != "MESH": return None
-    SelectObjectExclusive(obj, edit_mode=True)
+    select_obj_exclusive(obj, edit_mode=True)
 
     bm = bmesh.from_edit_mesh(obj.data)
     bm.faces.ensure_lookup_table()

@@ -1,5 +1,5 @@
 import bpy
-from .. common_utils import SelectObjectExclusive
+from ... common_utils import select_obj_exclusive
 
 class Decimate():
     def __init__(self):
@@ -7,7 +7,7 @@ class Decimate():
 
     def AssignDecimate(self, obj):
         if obj == None or obj.type != "MESH": return None
-        SelectObjectExclusive(obj)
+        select_obj_exclusive(obj)
 
         if len([m for m in obj.modifiers if m.name == self.decimateName]) == 0:
             dec = obj.modifiers.new(self.decimateName, 'DECIMATE')
@@ -25,7 +25,7 @@ class Decimate():
 
     def ApplyDecimate(self, obj):
         if obj == None or obj.type != "MESH": return None
-        SelectObjectExclusive(obj)
+        select_obj_exclusive(obj)
 
         for mod in obj.modifiers:
             if mod.type == 'DECIMATE' and mod.name == self.decimateName:

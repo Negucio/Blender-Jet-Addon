@@ -1,5 +1,6 @@
 import bpy
 
+#Panel
 class VIEW3D_PT_jet_step4(bpy.types.Panel):
     bl_label = "Step 4"
     bl_space_type = 'VIEW_3D'
@@ -13,3 +14,6 @@ class VIEW3D_PT_jet_step4(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         layout.label("Explode Prep")
+
+
+#Operators
