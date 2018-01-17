@@ -74,10 +74,10 @@ class DATA_OT_jet_obj_list_remove(bpy.types.Operator):
         return {'FINISHED'}
 
 
-class DATA_OT_jet_obj_list_select_all(bpy.types.Operator):
-    bl_idname = "jet_obj_list_select_all.btn"
-    bl_label = "Select all objects"
-    bl_description = "Select all objects from the list"
+class DATA_OT_jet_obj_list_selection(bpy.types.Operator):
+    bl_idname = "jet_obj_list_selection.btn"
+    bl_label = "Select/Unselect all objects"
+    bl_description = "Select/Unselect all objects from the list"
 
     select = bpy.props.BoolProperty(default=True)
     resolution = bpy.props.StringProperty(default='')
@@ -93,6 +93,28 @@ class DATA_OT_jet_obj_list_select_all(bpy.types.Operator):
             if (obj.Jet.low_res and self.resolution == Resolution.Low.name) or \
                (obj.Jet.high_res and self.resolution == Resolution.High.name):
                 obj.select = self.select
+        return {'FINISHED'}
+
+
+class DATA_OT_jet_obj_list_visibility(bpy.types.Operator):
+    bl_idname = "jet_obj_list_visibility.btn"
+    bl_label = "Show/Hide all objects"
+    bl_description = "Show/Hide all objects from the list"
+
+    hide = bpy.props.BoolProperty(default=False)
+    resolution = bpy.props.StringProperty(default='')
+
+    @classmethod
+    def poll(cls, context):
+        #This check needs to be done in the panel
+        #Local variable 'obj_list' can not be accessed from this class method
+        return True
+
+    def execute(self, context):
+        for obj in context.scene.objects:
+            if (obj.Jet.low_res and self.resolution == Resolution.Low.name) or \
+               (obj.Jet.high_res and self.resolution == Resolution.High.name):
+                obj.hide = self.hide
         return {'FINISHED'}
 
 

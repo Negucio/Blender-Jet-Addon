@@ -1,8 +1,9 @@
 import bpy
 
+from . step3_utils import apply_modifiers, remove_parent
+from . step3_classes import Decimate
 from ... list.list_classes import List, Resolution
 from ... common_utils import apply_to_selected
-from . step3_classes import Decimate
 
 #Panel
 class VIEW3D_PT_jet_step3(bpy.types.Panel):
@@ -35,13 +36,24 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
         row = layout.row(align=True)
         row.enabled = (len(obj_list) > 0)
         col = row.column()
-        sel_btn = col.operator("jet_obj_list_select_all.btn", text="Select All")
+        sel_btn = col.operator("jet_obj_list_selection.btn", text="Select All")
         sel_btn.resolution = list.resolution.name
         sel_btn.select = True
         col = row.column()
-        desel_btn = col.operator("jet_obj_list_select_all.btn", text="Deselect All")
+        desel_btn = col.operator("jet_obj_list_selection.btn", text="Deselect All")
         desel_btn.resolution = list.resolution.name
         desel_btn.select = False
+
+        row = layout.row(align=True)
+        row.enabled = (len(obj_list) > 0)
+        col = row.column()
+        show_btn = col.operator("jet_obj_list_visibility.btn", text="Show All")
+        show_btn.resolution = list.resolution.name
+        show_btn.hide = False
+        col = row.column()
+        hide_btn = col.operator("jet_obj_list_visibility.btn", text="Hide All")
+        hide_btn.resolution = list.resolution.name
+        hide_btn.hide = True
 
     def add_obj_list(self, context, layout, list):
         if type(list) is not List: return None
@@ -51,8 +63,8 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
         row.prop(context.scene.Jet.ui, list.obj_list)
         row = box.row()
         row.template_list(list.data_ul_obj_list, "", context.scene.Jet.ui, list.obj_list, context.scene.Jet.ui, list.obj_list_idx)
-
         self.add_buttons(context, box, list)
+        return box
 
 
     def draw(self, context):
@@ -60,15 +72,18 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
         layout.label("Hi-res Model Prep")
         self.add_obj_list(context, layout, self.list_low)
         self.add_obj_list(context, layout, self.list_high)
-        layout.operator("assign_decimate.btn", text="Assign Decimate")
-        layout.operator("apply_decimate.btn", text="Apply Decimate")
-        layout.operator("add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
-        layout.operator("add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
+
+        layout.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
+        layout.operator("jet_remove_parent.btn", text="Remove Parent")
+        layout.operator("jet_assign_decimate.btn", text="Assign Decimate")
+        layout.operator("jet_apply_decimate.btn", text="Apply Decimate")
+        layout.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
+        layout.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
 
 
 #Operators
 class VIEW3D_OT_jet_add_sufix(bpy.types.Operator):
-    bl_idname = "add_sufix.btn"
+    bl_idname = "jet_add_sufix.btn"
     bl_label = "Add sufix"
     bl_description = "Add sufix to the selected objects"
 
@@ -81,7 +96,7 @@ class VIEW3D_OT_jet_add_sufix(bpy.types.Operator):
         return {'FINISHED'}
 
 class VIEW3D_OT_jet_assign_decimate(bpy.types.Operator):
-    bl_idname = "assign_decimate.btn"
+    bl_idname = "jet_assign_decimate.btn"
     bl_label = "Assign Decimate"
     bl_description = "Assign Decimate modifier to selected objects"
 
@@ -92,7 +107,7 @@ class VIEW3D_OT_jet_assign_decimate(bpy.types.Operator):
         return {'FINISHED'}
 
 class VIEW3D_OT_jet_apply_decimate(bpy.types.Operator):
-    bl_idname = "apply_decimate.btn"
+    bl_idname = "jet_apply_decimate.btn"
     bl_label = "Apply Decimate"
     bl_description = "Apply Decimate modifier to selected objects"
 
@@ -102,3 +117,20 @@ class VIEW3D_OT_jet_apply_decimate(bpy.types.Operator):
         apply_to_selected(context, self.decimate.ApplyDecimate)
         return {'FINISHED'}
 
+class VIEW3D_OT_jet_apply_modifiers(bpy.types.Operator):
+    bl_idname = "jet_apply_modifiers.btn"
+    bl_label = "Apply Modifiers"
+    bl_description = "Apply modifiers to selected objects"
+
+    def execute(self, context):
+        apply_to_selected(context, apply_modifiers)
+        return {'FINISHED'}
+
+class VIEW3D_OT_jet_remove_parent(bpy.types.Operator):
+    bl_idname = "jet_remove_parent.btn"
+    bl_label = "Remove parents"
+    bl_description = "Remove parent to selected objects"
+
+    def execute(self, context):
+        apply_to_selected(context, remove_parent)
+        return {'FINISHED'}
