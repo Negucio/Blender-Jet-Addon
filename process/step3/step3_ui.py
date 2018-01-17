@@ -1,7 +1,8 @@
 import bpy
+
+from ... list.list_classes import List, Resolution
 from ... common_utils import apply_to_selected
 from . step3_classes import Decimate
-from ... list.list_ui import Resolution
 
 #Panel
 class VIEW3D_PT_jet_step3(bpy.types.Panel):
@@ -10,38 +11,55 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
 
+    list_high = List(Resolution.High, "high_obj_list", "high_obj_list_idx", "DATA_UL_jet_high_obj_list")
+    list_low = List(Resolution.Low, "low_obj_list", "low_obj_list_idx", "DATA_UL_jet_low_obj_list")
+
     @classmethod
     def poll(cls, context):
         return True
 
-    def add_obj_list(self, context, layout, resolution):
-        if resolution == Resolution.Low:
-            obj_list_ui = "DATA_UL_jet_low_obj_list"
-            obj_list = "low_obj_list"
-            obj_list_idx = "low_obj_list_idx"
-        elif resolution == Resolution.High:
-            obj_list_ui = "DATA_UL_jet_high_obj_list"
-            obj_list = "high_obj_list"
-            obj_list_idx = "high_obj_list_idx"
+    def add_buttons(self, context, layout, list):
+        row = layout.row(align=True)
+        col = row.column()
+        add_btn = col.operator("jet_obj_list_add.btn", text="Add")
+        add_btn.resolution = list.resolution.name
+        add_btn.obj_list = list.obj_list
+        col = row.column()
+        obj_list = getattr(context.scene.Jet.ui, list.obj_list)
+        col.enabled = (len(obj_list) > 0)
+        rmv_btn = col.operator("jet_obj_list_remove.btn", text="Remove")
+        rmv_btn.resolution = list.resolution.name
+        rmv_btn.obj_list = list.obj_list
+        rmv_btn.obj_list_idx = list.obj_list_idx
 
+        row = layout.row(align=True)
+        row.enabled = (len(obj_list) > 0)
+        col = row.column()
+        sel_btn = col.operator("jet_obj_list_select_all.btn", text="Select All")
+        sel_btn.resolution = list.resolution.name
+        sel_btn.select = True
+        col = row.column()
+        desel_btn = col.operator("jet_obj_list_select_all.btn", text="Deselect All")
+        desel_btn.resolution = list.resolution.name
+        desel_btn.select = False
+
+    def add_obj_list(self, context, layout, list):
+        if type(list) is not List: return None
         box = layout.box()
         row = box.row()
-        row.label(text=resolution.name + ":")
-        row.prop(context.scene.Jet.ui, obj_list)
+        row.label(text=list.resolution.name + ":")
+        row.prop(context.scene.Jet.ui, list.obj_list)
         row = box.row()
-        row.template_list(obj_list_ui, "", context.scene.Jet.ui, obj_list, context.scene.Jet.ui, obj_list_idx)
-        row = box.row(align=True)
-        row.operator("jet_obj_list_add.btn", text="Add").resolution = obj_list
-        row.operator("jet_obj_list_remove.btn", text="Remove").resolution = obj_list
-        #row = box.row(align=True)
-        #row.operator("jet_obj_Blist_add.btn", text="Select")
-        #row.operator("jet_obj_list_remove.btn", text="Deselect")
+        row.template_list(list.data_ul_obj_list, "", context.scene.Jet.ui, list.obj_list, context.scene.Jet.ui, list.obj_list_idx)
+
+        self.add_buttons(context, box, list)
+
 
     def draw(self, context):
         layout = self.layout
         layout.label("Hi-res Model Prep")
-        self.add_obj_list(context, layout, Resolution.High)
-        self.add_obj_list(context, layout, Resolution.Low)
+        self.add_obj_list(context, layout, self.list_low)
+        self.add_obj_list(context, layout, self.list_high)
         layout.operator("assign_decimate.btn", text="Assign Decimate")
         layout.operator("apply_decimate.btn", text="Apply Decimate")
         layout.operator("add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"

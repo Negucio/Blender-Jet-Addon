@@ -1,4 +1,5 @@
 import bpy
+from . common_utils import get_id
 
 
 class ObjIdPropertyGroup(bpy.types.PropertyGroup):
@@ -7,10 +8,10 @@ class ObjIdPropertyGroup(bpy.types.PropertyGroup):
 
 
 class ObjListPropertyGroup(bpy.types.PropertyGroup):
-    high_obj_list_idx = bpy.props.IntProperty(name="Index", default=0, min=0)
     high_obj_list = bpy.props.CollectionProperty(type=ObjIdPropertyGroup)
-    low_obj_list_idx = bpy.props.IntProperty(name="Index", default=0, min=0)
+    high_obj_list_idx = bpy.props.IntProperty(name="Index", default=0, min=0)
     low_obj_list = bpy.props.CollectionProperty(type=ObjIdPropertyGroup)
+    low_obj_list_idx = bpy.props.IntProperty(name="Index", default=0, min=0)
 
 
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
@@ -18,6 +19,7 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 
 
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
+    object_id = property(get_id)
     high_res = bpy.props.BoolProperty(options={'HIDDEN'}, default = False)
     low_res = bpy.props.BoolProperty(options={'HIDDEN'}, default = False)
 

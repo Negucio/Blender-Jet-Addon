@@ -1,5 +1,10 @@
 import bpy, sys
 
+def get_id(object):
+    if "id" not in object.keys():
+        object["id"] = str(hash(object))
+    return object["id"]
+
 def select_obj_exclusive(obj, edit_mode = False):
     bpy.context.scene.objects.active = obj
     bpy.ops.object.mode_set(mode="OBJECT")
