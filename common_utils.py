@@ -1,6 +1,6 @@
 import bpy, sys
 
-def SelectObjectExclusive(obj, edit_mode = False):
+def select_obj_exclusive(obj, edit_mode = False):
     bpy.context.scene.objects.active = obj
     bpy.ops.object.mode_set(mode="OBJECT")
     bpy.ops.object.select_all(action='DESELECT')
@@ -19,7 +19,7 @@ def update_progress(job_title, progress, processingObj):
     sys.stdout.write(msg)
     sys.stdout.flush()
 
-def ApplyToSelected(context, func):
+def apply_to_selected(context, func, keep_selection = True, keep_active = True):
     sel_objs = context.selected_objects
     active_obj = context.active_object
     numObjs = len(sel_objs)
@@ -37,8 +37,19 @@ def ApplyToSelected(context, func):
 
     bpy.ops.object.mode_set(mode="OBJECT")
     bpy.ops.object.select_all(action='DESELECT')
-    for obj in reversed(sel_objs):
-        obj.select = True
-    if hasattr(bpy.context, "scene"):
-        bpy.context.scene.objects.active = active_obj
+    if keep_selection:
+        for obj in reversed(sel_objs):
+            obj.select = True
+    if keep_active:
+        if hasattr(bpy.context, "scene"):
+            bpy.context.scene.objects.active = active_obj
 
+def get_mesh_objs_selected(context):
+    return [obj for obj in context.selected_objects if obj.type == 'MESH']
+
+def any_mesh_obj_selected(context):
+    return len(get_mesh_objs_selected(context)) > 0
+
+def redraw(context):
+    if hasattr(context, "area") and context.area is not None:
+        context.area.tag_redraw()
