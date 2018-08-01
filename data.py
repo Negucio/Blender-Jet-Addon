@@ -1,5 +1,6 @@
 import bpy
 from . common_utils import get_id
+from . list.data import ObjListPropertyGroup
 
 
 class ObjIdPropertyGroup(bpy.types.PropertyGroup):
@@ -7,15 +8,9 @@ class ObjIdPropertyGroup(bpy.types.PropertyGroup):
     object = bpy.props.StringProperty(name="object name", default="Object")
 
 
-class ObjListPropertyGroup(bpy.types.PropertyGroup):
-    high_obj_list = bpy.props.CollectionProperty(type=ObjIdPropertyGroup)
-    high_obj_list_idx = bpy.props.IntProperty(name="Index", default=0, min=0)
-    low_obj_list = bpy.props.CollectionProperty(type=ObjIdPropertyGroup)
-    low_obj_list_idx = bpy.props.IntProperty(name="Index", default=0, min=0)
-
-
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
-    ui = bpy.props.PointerProperty(options={'HIDDEN'}, type=ObjListPropertyGroup)
+    list_high_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
+    list_low_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
 
 
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
@@ -26,19 +21,19 @@ class ObjJetPropertyGroup(bpy.types.PropertyGroup):
 
 def register():
     bpy.utils.register_class(ObjIdPropertyGroup)
-    bpy.utils.register_class(ObjListPropertyGroup)
     bpy.utils.register_class(ObjJetPropertyGroup)
     bpy.utils.register_class(ScnJetPropertyGroup)
 
     bpy.types.Scene.Jet = bpy.props.PointerProperty(options={'HIDDEN'}, type=ScnJetPropertyGroup)
     bpy.types.Object.Jet = bpy.props.PointerProperty(options={'HIDDEN'}, type=ObjJetPropertyGroup)
 
+
 def unregister():
     del bpy.types.Scene.Jet
+    del bpy.types.Object.Jet
 
     bpy.utils.unregister_class(ScnJetPropertyGroup)
     bpy.utils.unregister_class(ObjJetPropertyGroup)
-    bpy.utils.unregister_class(ObjListPropertyGroup)
     bpy.utils.unregister_class(ObjIdPropertyGroup)
 
 

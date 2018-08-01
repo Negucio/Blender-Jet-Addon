@@ -10,7 +10,7 @@ def handle_error(ex):
     print("Error loading Texture Atlas Addon: " + ex)
 
 def enable_texture_atlas():
-    enable("uv_texture_atlas", default_set=True, persistent=False, handle_error=handle_error)
+    enable("uv_texture_atlas", default_set=True, persistent=True, handle_error=handle_error)
 
 def triangulate(obj):
     if obj == None or obj.type != "MESH": return None

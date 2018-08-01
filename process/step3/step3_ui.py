@@ -2,7 +2,7 @@ import bpy
 
 from . step3_utils import apply_modifiers, remove_parent
 from . step3_classes import Decimate
-from ... list.list_classes import List, Resolution
+from ... list.utils import draw_list
 from ... common_utils import apply_to_selected
 
 #Panel
@@ -12,66 +12,17 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
 
-    list_high = List(Resolution.High, "high_obj_list", "high_obj_list_idx", "DATA_UL_jet_high_obj_list")
-    list_low = List(Resolution.Low, "low_obj_list", "low_obj_list_idx", "DATA_UL_jet_low_obj_list")
-
     @classmethod
     def poll(cls, context):
         return True
 
-    def add_buttons(self, context, layout, list):
-        row = layout.row(align=True)
-        col = row.column()
-        add_btn = col.operator("jet_obj_list_add.btn", text="Add")
-        add_btn.resolution = list.resolution.name
-        add_btn.obj_list = list.obj_list
-        col = row.column()
-        obj_list = getattr(context.scene.Jet.ui, list.obj_list)
-        col.enabled = (len(obj_list) > 0)
-        rmv_btn = col.operator("jet_obj_list_remove.btn", text="Remove")
-        rmv_btn.resolution = list.resolution.name
-        rmv_btn.obj_list = list.obj_list
-        rmv_btn.obj_list_idx = list.obj_list_idx
-
-        row = layout.row(align=True)
-        row.enabled = (len(obj_list) > 0)
-        col = row.column()
-        sel_btn = col.operator("jet_obj_list_selection.btn", text="Select All")
-        sel_btn.resolution = list.resolution.name
-        sel_btn.select = True
-        col = row.column()
-        desel_btn = col.operator("jet_obj_list_selection.btn", text="Deselect All")
-        desel_btn.resolution = list.resolution.name
-        desel_btn.select = False
-
-        row = layout.row(align=True)
-        row.enabled = (len(obj_list) > 0)
-        col = row.column()
-        show_btn = col.operator("jet_obj_list_visibility.btn", text="Show All")
-        show_btn.resolution = list.resolution.name
-        show_btn.hide = False
-        col = row.column()
-        hide_btn = col.operator("jet_obj_list_visibility.btn", text="Hide All")
-        hide_btn.resolution = list.resolution.name
-        hide_btn.hide = True
-
-    def add_obj_list(self, context, layout, list):
-        if type(list) is not List: return None
-        box = layout.box()
-        row = box.row()
-        row.label(text=list.resolution.name + ":")
-        row.prop(context.scene.Jet.ui, list.obj_list)
-        row = box.row()
-        row.template_list(list.data_ul_obj_list, "", context.scene.Jet.ui, list.obj_list, context.scene.Jet.ui, list.obj_list_idx)
-        self.add_buttons(context, box, list)
-        return box
-
-
     def draw(self, context):
         layout = self.layout
         layout.label("Hi-res Model Prep")
-        self.add_obj_list(context, layout, self.list_low)
-        self.add_obj_list(context, layout, self.list_high)
+        data_path_low = "scene.Jet.list_low_res"
+        data_path_high = "scene.Jet.list_high_res"
+        draw_list(context, data_path_low, layout, "Low-res", tuple_buttons=(True, False, True, True))
+        draw_list(context, data_path_high, layout, "High-res", tuple_buttons=(True, False, True, True))
 
         layout.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
         layout.operator("jet_remove_parent.btn", text="Remove Parent")
