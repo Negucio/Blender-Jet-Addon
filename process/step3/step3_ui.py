@@ -20,9 +20,11 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
         layout = self.layout
         layout.label("Hi-res Model Prep")
         data_path_low = "scene.Jet.list_low_res"
-        data_path_high = "scene.Jet.list_high_res"
         draw_list(context, data_path_low, layout, "Low-res", tuple_buttons=(True, False, True, True))
-        draw_list(context, data_path_high, layout, "High-res", tuple_buttons=(True, False, True, True))
+        if len(context.scene.Jet.list_low_res.obj_list) > 0:
+            idx = context.scene.Jet.list_low_res.obj_list_index
+            data_path_high = "scene.Jet.list_low_res.obj_list[" + str(idx) + "].object.Jet.list_high_res"
+            draw_list(context, data_path_high, layout, "High-res", tuple_buttons=(True, False, True, True))
 
         layout.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
         layout.operator("jet_remove_parent.btn", text="Remove Parent")
