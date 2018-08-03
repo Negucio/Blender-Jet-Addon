@@ -1,4 +1,4 @@
-import bpy
+import bpy, os
 from ... common_utils import select_obj_exclusive
 
 def apply_modifiers(obj):
@@ -13,3 +13,15 @@ def apply_modifiers(obj):
 def remove_parent(obj):
     if not hasattr(obj, "parent"): return None
     obj.parent = None
+
+
+def Append(blendfile, section='Object', link=False):
+    #Check if the path and the file in blendfile exists
+    section = '\\' + section + '\\'
+    print(section)
+
+    with bpy.data.libraries.load(blendfile) as (data_from, data_to):
+        files = []
+        for obj in data_from.objects:
+            files.append({'name': obj})
+        bpy.ops.wm.append(directory=blendfile + section, files=files, link=link)

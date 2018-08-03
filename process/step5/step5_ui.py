@@ -1,5 +1,5 @@
 import bpy
-from . step5_utils import apply_modifiers, remove_parent
+from . step5_utils import apply_modifiers, remove_parent, Append
 from ... list.utils import draw_list
 from ... common_utils import apply_to_selected
 from . step5_classes import Decimate
@@ -37,7 +37,15 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         #col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
         #col.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
 
-        col.label("-Select High Resolution Model .blend")
+        col.prop(context.scene.Jet, "optimized_res_file", text="Optimized")
+        op_optimized = col.operator("jet_append_delete_link.btn", text="Append optimized")
+        op_optimized.blendfile = context.scene.Jet.optimized_res_file
+
+        col.prop(context.scene.Jet, "high_res_file", text="High Res")
+        op_high = col.operator("jet_link.btn", text="Append high")
+        op_high.blendfile = context.scene.Jet.high_res_file
+        op_high.section = 'Mesh'
+
         col.label("-Select Optimized Model .blend")
         col.label("-Swap Optimized / High Resolution")
 
@@ -57,6 +65,36 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
 #        return {'FINISHED'}
 
 
+class VIEW3D_OT_jet_link(bpy.types.Operator):
+    bl_idname = "jet_link.btn"
+    bl_label = ""
+    bl_description = ""
+
+    blendfile = bpy.props.StringProperty(default='')
+    section = bpy.props.StringProperty(default='Object')
+
+    def execute(self, context):
+        Append(self.blendfile, section=self.section, link=True)
+        return {'FINISHED'}
+
+
+class VIEW3D_OT_jet_append_delete_link(bpy.types.Operator):
+    bl_idname = "jet_append_delete_link.btn"
+    bl_label = ""
+    bl_description = ""
+
+    blendfile = bpy.props.StringProperty(default='')
+
+    def execute(self, context):
+        Append(self.blendfile, section='Mesh', link=True)
+        Append(self.blendfile, section='Object', link=False)
+        #for obj in context.selected_objects:
+            # D.meshes.remove(C.active_object.data)
+        #    bpy.data.meshes.remove(obj.data)
+
+        return {'FINISHED'}
+
+
 class VIEW3D_OT_jet_apply_modifiers(bpy.types.Operator):
     bl_idname = "jet_apply_modifiers.btn"
     bl_label = "Apply Modifiers"
@@ -66,6 +104,7 @@ class VIEW3D_OT_jet_apply_modifiers(bpy.types.Operator):
         apply_to_selected(context, apply_modifiers)
         return {'FINISHED'}
 
+
 class VIEW3D_OT_jet_remove_parent(bpy.types.Operator):
     bl_idname = "jet_remove_parent.btn"
     bl_label = "Remove parents"
@@ -74,6 +113,7 @@ class VIEW3D_OT_jet_remove_parent(bpy.types.Operator):
     def execute(self, context):
         apply_to_selected(context, remove_parent)
         return {'FINISHED'}
+
 
 class VIEW3D_OT_jet_assign_decimate(bpy.types.Operator):
     bl_idname = "jet_assign_decimate.btn"
@@ -86,9 +126,14 @@ class VIEW3D_OT_jet_assign_decimate(bpy.types.Operator):
         apply_to_selected(context, self.decimate.AssignDecimate)
         return {'FINISHED'}
 
+
 class VIEW3D_OT_jet_apply_decimate(bpy.types.Operator):
     bl_idname = "jet_apply_decimate.btn"
     bl_label = "Apply Decimate"
     bl_description = "Apply Decimate modifier to selected objects"
 
     decimate = Decimate()
+
+    def execute(self, context):
+        apply_to_selected(context, self.decimate.ApplyDecimate)
+        return {'FINISHED'}

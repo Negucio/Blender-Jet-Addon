@@ -8,6 +8,7 @@ class VIEW3D_PT_jet_step4(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
+    bl_options = {'DEFAULT_CLOSED'}
 
     @classmethod
     def poll(cls, context):
@@ -48,7 +49,7 @@ class VIEW3D_PT_jet_step4(bpy.types.Panel):
         col.operator("jet_triangulate.btn", text="Triangulate")
 
 
-#Panel
+#Panel UV Editor
 class VIEW3D_PT_jet_step4_UVEditor(bpy.types.Panel):
     bl_label = "Step 4"
     bl_space_type = 'IMAGE_EDITOR'
@@ -124,10 +125,6 @@ class VIEW3D_OT_jet_seam(bpy.types.Operator):
         ManageSeam(context, self.mark)
         return {'FINISHED'}
 
-
-
-
-
 class VIEW3D_OT_jet_triangulate(bpy.types.Operator):
     bl_idname = "jet_triangulate.btn"
     bl_label = "Triangulate"
@@ -136,7 +133,6 @@ class VIEW3D_OT_jet_triangulate(bpy.types.Operator):
     def execute(self, context):
         apply_to_selected(context, triangulate)
         return {'FINISHED'}
-
 
 class VIEW3D_OT_jet_texture_atlas_on(bpy.types.Operator):
     bl_idname = "jet_texture_atlas_on.btn"

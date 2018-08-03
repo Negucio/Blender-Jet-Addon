@@ -10,13 +10,15 @@ class ObjIdPropertyGroup(bpy.types.PropertyGroup):
 
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
     list_low_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
+    high_res_file = bpy.props.StringProperty(name="", default="", subtype="FILE_PATH")
+    optimized_res_file = bpy.props.StringProperty(name="", default="", subtype="FILE_PATH")
 
 
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
     object_id = property(get_id)
     list_high_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
-    high_res = bpy.props.BoolProperty(options={'HIDDEN'}, default = False)
-    low_res = bpy.props.BoolProperty(options={'HIDDEN'}, default = False)
+    high_res = bpy.props.BoolProperty(options={'HIDDEN'}, default=False)
+    low_res = bpy.props.BoolProperty(options={'HIDDEN'}, default=False)
 
 
 def register():
