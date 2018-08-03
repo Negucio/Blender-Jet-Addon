@@ -13,7 +13,7 @@ class VIEW3D_PT_jet_step6(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.label("Cages")
+        layout.label("Bake Sets Creation")
 
 
 #Operators

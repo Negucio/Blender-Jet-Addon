@@ -19,8 +19,7 @@ def get_property(context, data_path):
 
 def draw_list(context, data_path, layout, title, tuple_buttons=(True, True, True, True)):
     prop = get_property(context, data_path)
-    row = layout.row()
-    box = row.box()
+    box = layout.box()
     row = box.row()
 
     split = row.split(percentage=0.6)
