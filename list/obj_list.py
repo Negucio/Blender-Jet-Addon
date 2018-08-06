@@ -11,24 +11,13 @@ class_ids = {'add': PREFIX + "obj_list_add.btn",
            'list': PREFIX + "DATA_UL_obj_list"
            }
 
-class ListOperator():
-    def updata_data_path(self, context):
-        ListOperator.data_path_cls = self.data_path
 
-    data_path = StringProperty(name="data_path", default='', update=updata_data_path)
-    data_path_cls = ''
+class ListOperator():
+    data_path = StringProperty(name="data_path", default='')
 
     @staticmethod
     def get_prop(context, data_path):
         return get_property(context, data_path)
-
-    @classmethod
-    def has_objects(cls, context):
-        prop = cls.get_prop(context, cls.data_path_cls)
-        if prop is None:
-            return False
-        # Enabled when the list contains, at least, one item
-        return len(prop.obj_list) > 0
 
 
 class ObjQuantityOperator(ListOperator):
@@ -114,7 +103,6 @@ class DATA_OT_obj_list_add(ObjQuantityOperator, Operator):
     bl_label = "Add Object(s)"
     bl_description = "Add selected object(s) to the list"
 
-
     @classmethod
     def poll(cls, context):
         return cls.check_selected_objs(context)
@@ -134,7 +122,7 @@ class DATA_OT_obj_list_remove(ObjQuantityOperator, Operator):
 
     @classmethod
     def poll(cls, context):
-        return cls.has_objects(context)
+        return True
 
     def execute(self, context):
         self.remove_obj(context)
@@ -151,7 +139,7 @@ class DATA_OT_obj_list_clear(ObjQuantityOperator, Operator):
 
     @classmethod
     def poll(cls, context):
-        return cls.has_objects(context)
+        return True
 
     def execute(self, context):
         self.clear_objs(context)
@@ -170,7 +158,7 @@ class DATA_OT_obj_list_select(ObjSelectionOperator, Operator):
 
     @classmethod
     def poll(cls, context):
-        return cls.has_objects(context)
+        return True
 
     def execute(self, context):
         self.select_objs(context, self.select)
@@ -189,7 +177,7 @@ class DATA_OT_obj_list_hide(ObjVisibilityOperator, Operator):
 
     @classmethod
     def poll(cls, context):
-        return cls.has_objects(context)
+        return True
 
     def execute(self, context):
         self.hide_objs(context, self.hide)
