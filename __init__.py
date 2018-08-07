@@ -3,7 +3,7 @@ bl_info = {
     "name": "Jet",
     "author": "",
     "description": "",
-    "version": (0, 0, 0),
+    "version": (0, 1, 0),
     "blender": (2, 7, 8),
     "location": "",
     "warning": "",

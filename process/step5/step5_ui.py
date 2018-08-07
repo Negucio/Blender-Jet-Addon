@@ -1,5 +1,6 @@
 import bpy
-from . step5_utils import apply_modifiers, remove_parent, Append
+import os.path
+from . step5_utils import apply_modifiers, remove_parent, AppendMeshes, AppendObjects, Switch
 from ... list.utils import draw_list
 from ... common_utils import apply_to_selected
 from . step5_classes import Decimate
@@ -34,23 +35,21 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         col.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
         col.label("-Aplicar restricciones y transformación visual")
         col.operator("jet_remove_parent.btn", text="Remove Parent")
-        #col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
-        #col.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
 
+        col = layout.column(align=True)
         col.prop(context.scene.Jet, "optimized_res_file", text="Optimized")
-        op_optimized = col.operator("jet_append_delete_link.btn", text="Append optimized")
-        op_optimized.blendfile = context.scene.Jet.optimized_res_file
+        col.prop(context.scene.Jet, "high_res_file", text="Hi-Res")
 
-        col.prop(context.scene.Jet, "high_res_file", text="High Res")
-        op_high = col.operator("jet_link.btn", text="Append high")
-        op_high.blendfile = context.scene.Jet.high_res_file
-        op_high.section = 'Mesh'
+        op = col.operator("jet_append_opt_high.btn", text="Append")
+        op.optimized = context.scene.Jet.optimized_res_file
+        op.high = context.scene.Jet.high_res_file
 
-        col.label("-Select Optimized Model .blend")
-        col.label("-Swap Optimized / High Resolution")
+        col.operator("jet_switch_hi_opt.btn", text="Swap Optimized / High Resolution")
 
 
 #Operators
+#col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
+#col.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
 #class VIEW3D_OT_jet_add_sufix(bpy.types.Operator):
 #    bl_idname = "jet_add_sufix.btn"
 #    bl_label = "Add sufix"
@@ -64,34 +63,47 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
 #            obj.name = obj.name + self.sufix
 #        return {'FINISHED'}
 
-
-class VIEW3D_OT_jet_link(bpy.types.Operator):
-    bl_idname = "jet_link.btn"
+class VIEW3D_OT_jet_append_opt_high(bpy.types.Operator):
+    bl_idname = "jet_append_opt_high.btn"
     bl_label = ""
     bl_description = ""
 
-    blendfile = bpy.props.StringProperty(default='')
-    section = bpy.props.StringProperty(default='Object')
+    optimized = bpy.props.StringProperty(default='')
+    high = bpy.props.StringProperty(default='')
+
+    @classmethod
+    def poll(cls, context):
+        hi = (context.scene.Jet.high_res_file != "") and os.path.isfile(context.scene.Jet.high_res_file)
+        return hi and ((context.scene.Jet.optimized_res_file != "") and os.path.isfile(context.scene.Jet.optimized_res_file))
 
     def execute(self, context):
-        Append(self.blendfile, section=self.section, link=True)
+        AppendMeshes(self.optimized, collection=context.scene.Jet.opt_meshes, link=True)
+        AppendObjects(self.optimized, collection=context.scene.Jet.opt_high_objs, link=False)
+
+        AppendMeshes(self.high, collection=context.scene.Jet.high_meshes, link=True)
+
+        for o in context.scene.Jet.opt_high_objs:
+            o.object.Jet.opt_mesh.mesh = o.object.data
+            for m in context.scene.Jet.high_meshes:
+                if o.object.data.name == m.mesh.name:
+                    o.object.Jet.high_mesh.mesh = m.mesh
+
         return {'FINISHED'}
 
 
-class VIEW3D_OT_jet_append_delete_link(bpy.types.Operator):
-    bl_idname = "jet_append_delete_link.btn"
+
+class VIEW3D_OT_jet_switch_hi_opt(bpy.types.Operator):
+    bl_idname = "jet_switch_hi_opt.btn"
     bl_label = ""
     bl_description = ""
 
-    blendfile = bpy.props.StringProperty(default='')
+    @classmethod
+    def poll(cls, context):
+        return len(context.scene.Jet.opt_high_objs)>0
 
     def execute(self, context):
-        Append(self.blendfile, section='Mesh', link=True)
-        Append(self.blendfile, section='Object', link=False)
-        #for obj in context.selected_objects:
-            # D.meshes.remove(C.active_object.data)
-        #    bpy.data.meshes.remove(obj.data)
-
+        context.scene.Jet.high_res = not context.scene.Jet.high_res
+        Switch(context.scene.Jet.opt_high_objs, context.scene.Jet.high_res)
         return {'FINISHED'}
 
 
