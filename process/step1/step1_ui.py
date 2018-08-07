@@ -1,4 +1,6 @@
 import bpy
+from ... common_utils import get_hotkey
+from . step1_utils import SnapToFaces, SnapToVertices
 
 #Panel
 class VIEW3D_PT_jet_step1(bpy.types.Panel):
@@ -6,7 +8,7 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
-    bl_options = {'DEFAULT_CLOSED'}
+    #bl_options = {'DEFAULT_CLOSED'}
 
     @classmethod
     def poll(cls, context):
@@ -39,24 +41,50 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
         layout.label("Retopology:")
 
         col = layout.column(align=True)
-        col.label("-Activar Snap a caras para retopo")
-        col.label("-Activar Snap a vértices para soldar vértices rápidamente")
-        col.operator("object.shade_flat", text="Flat")
-        col.label("*Integración con Addon Ice Tools (para Shrinkwrap)")
-        self.ice_tools(col, context)
-        col.label("-Opciones de visualización (hidden wire, x-ray… posiblemente usar lo mismo que Ice Tools)")
-        col.label("-Crear y Extruír vértices (Ctrl+Click)")
-        col.label("-Rellenar (F)")
-        col.label("-LoopCut and Slide (Ctrl+R)")
-        col.label("-Knife (K)")
-        col.label("-Activar addon F2 (Recordatorio)")
-        col.label("-Extender Vértices (Alt+D)")
-        col.label("-Rip (V)")
-        col.label("-Rip Fill (Alt+V)")
+        col.operator("jet_snap_faces.btn", text="Snap to face")
+        col.operator("jet_snap_vertices.btn", text="Snap to vertex")
 
+        col = layout.column(align=True)
+        col.operator("object.shade_flat", text="Flat")
+
+        col = layout.column(align=True)
+        self.ice_tools(col, context)
+
+        col = layout.column(align=True)
+        col.operator("mesh.dupli_extrude_cursor", text="Extrude to Cursor - " + get_hotkey(context, "mesh.dupli_extrude_cursor"))
+        col.operator("mesh.f2", text="MakeEdge/Face - " + get_hotkey(context, "mesh.f2"))
+        col.operator("mesh.loopcut_slide", text="LoopCut and Slide - " + get_hotkey(context, "mesh.loopcut_slide"))
+        col.operator("mesh.knife_tool", text="Knife - " + get_hotkey(context, "mesh.knife_tool"))
+        col.operator("mesh.rip_edge_move", text="Extend Vertices - " + get_hotkey(context, "mesh.rip_edge_move"))
+        col.operator("mesh.rip_move", text="Rip - " + get_hotkey(context, "mesh.rip_move"))
+        col.operator("mesh.rip_move_fill", text="Rip Fill - " + get_hotkey(context, "mesh.rip_move_fill"))
 
 #Operators
+class VIEW3D_OT_jet_snap_faces(bpy.types.Operator):
+    bl_idname = "jet_snap_faces.btn"
+    bl_label = "Snap to face"
+    bl_description = "Project individual elements = True\nAlign rotation = True\nSnap onto itself = False"
 
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        SnapToFaces(context.scene)
+        return {'FINISHED'}
+
+class VIEW3D_OT_jet_snap_vertices(bpy.types.Operator):
+    bl_idname = "jet_snap_vertices.btn"
+    bl_label = "Snap to vertex"
+    bl_description = "Align rotation = False\nSnap onto itself = True"
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        SnapToVertices(context.scene)
+        return {'FINISHED'}
 
 
 

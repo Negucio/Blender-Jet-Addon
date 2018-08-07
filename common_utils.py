@@ -72,3 +72,46 @@ def get_preferences():
     addon_name = get_addon_name()
     return bpy.context.user_preferences.addons[addon_name].preferences
 
+def get_hotkey(context, keymap_item):
+    wm = context.window_manager
+    item = None
+    #wm.keyconfigs.active.keymaps['Mesh'].keymap_items
+    for km in wm.keyconfigs.user.keymaps:
+        for kmi in km.keymap_items:
+            if kmi.active and kmi.idname == keymap_item:
+                item = kmi
+                break
+
+    if item is None:
+        for km in wm.keyconfigs.addon.keymaps:
+            for kmi in km.keymap_items:
+                if kmi.active and kmi.idname == keymap_item:
+                    item = kmi
+                    break
+
+    if item is None:
+        for km in wm.keyconfigs.active.keymaps:
+            for kmi in km.keymap_items:
+                if kmi.active and kmi.idname == keymap_item:
+                    item = kmi
+                    break
+
+    if item is None:
+        return ""
+
+    hotkey = ""
+    if item.ctrl:
+        hotkey = hotkey + "Ctrl+"
+    if item.alt:
+        hotkey = hotkey + "Alt+"
+    if item.shift:
+        hotkey = hotkey + "Shift+"
+    if item.oskey:
+        hotkey = hotkey + "OSkey+"
+    if item.key_modifier != 'NONE':
+        hotkey = hotkey + item.key_modifier + "+"
+
+    return hotkey + item.type
+
+
+
