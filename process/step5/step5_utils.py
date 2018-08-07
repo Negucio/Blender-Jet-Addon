@@ -14,6 +14,18 @@ def remove_parent(obj):
     if not hasattr(obj, "parent"): return None
     obj.parent = None
 
+def Append(context, optimized, high):
+    AppendMeshes(optimized, collection=context.scene.Jet.opt_meshes, link=True)
+    AppendObjects(optimized, collection=context.scene.Jet.opt_high_objs, link=False)
+
+    AppendMeshes(high, collection=context.scene.Jet.high_meshes, link=True)
+
+    for o in context.scene.Jet.opt_high_objs:
+        o.object.Jet.opt_mesh = o.object.data
+        for m in context.scene.Jet.high_meshes:
+            if o.object.data.name == m.mesh.name:
+                o.object.Jet.high_mesh = m.mesh
+
 
 def AppendMeshes(blendfile, collection=None, link=False, fake_user=False):
     section = '\\' + 'Mesh' + '\\'
@@ -63,6 +75,6 @@ def AppendObjects(blendfile, collection=None, link=False, fake_user=False):
 def Switch(objs, high):
     for o in objs:
         if high:
-            o.object.data = o.object.Jet.high_mesh.mesh
+            o.object.data = o.object.Jet.high_mesh
         else:
-            o.object.data = o.object.Jet.opt_mesh.mesh
+            o.object.data = o.object.Jet.opt_mesh

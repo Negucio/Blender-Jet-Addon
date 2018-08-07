@@ -1,6 +1,6 @@
 import bpy
 import os.path
-from . step5_utils import apply_modifiers, remove_parent, AppendMeshes, AppendObjects, Switch
+from . step5_utils import apply_modifiers, remove_parent, Append, Switch
 from ... list.utils import draw_list
 from ... common_utils import apply_to_selected
 from . step5_classes import Decimate
@@ -77,17 +77,7 @@ class VIEW3D_OT_jet_append_opt_high(bpy.types.Operator):
         return hi and ((context.scene.Jet.optimized_res_file != "") and os.path.isfile(context.scene.Jet.optimized_res_file))
 
     def execute(self, context):
-        AppendMeshes(self.optimized, collection=context.scene.Jet.opt_meshes, link=True)
-        AppendObjects(self.optimized, collection=context.scene.Jet.opt_high_objs, link=False)
-
-        AppendMeshes(self.high, collection=context.scene.Jet.high_meshes, link=True)
-
-        for o in context.scene.Jet.opt_high_objs:
-            o.object.Jet.opt_mesh.mesh = o.object.data
-            for m in context.scene.Jet.high_meshes:
-                if o.object.data.name == m.mesh.name:
-                    o.object.Jet.high_mesh.mesh = m.mesh
-
+        Append(context, self.optimized, self.high)
         return {'FINISHED'}
 
 

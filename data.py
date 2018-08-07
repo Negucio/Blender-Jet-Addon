@@ -29,11 +29,9 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
     object_id = property(get_id)
     list_high_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
-    high_res = bpy.props.BoolProperty(options={'HIDDEN'}, default=False)
-    low_res = bpy.props.BoolProperty(options={'HIDDEN'}, default=False)
 
-    opt_mesh = bpy.props.PointerProperty(type=MeshPropertyGroup)
-    high_mesh = bpy.props.PointerProperty(type=MeshPropertyGroup)
+    opt_mesh = bpy.props.PointerProperty(type=bpy.types.Mesh)
+    high_mesh = bpy.props.PointerProperty(type=bpy.types.Mesh)
 
 
 def register():
