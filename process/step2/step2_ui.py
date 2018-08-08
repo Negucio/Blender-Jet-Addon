@@ -19,7 +19,24 @@ class VIEW3D_PT_jet_step2(bpy.types.Panel):
 
         col = layout.column(align=True)
         col.operator("mesh.merge", text="Merge - " + get_hotkey(context, "mesh.merge"))
-        #col.operator("mesh.merge", text="Merge - " + get_hotkey(context, "mesh.merge")).type = "COLLAPSE"
+
+        # Error: EXCEPTION_ACCESS_VIOLATION:
+        """
+        Couldn't unmap memory
+        Traceback (most recent call last):
+          File "\AppData\Roaming\Blender Foundation\Blender\2.79\scripts\addons\Jet\process\step2\step2_ui.py", line 26, in draw
+            col.operator("mesh.merge", text="Collapse").type = 'COLLAPSE'
+        TypeError: bpy_struct: item.attr = val: enum "COLLAPSE" not found in ()
+        
+        location: <unknown location>:-1
+        
+        location: <unknown location>:-1
+        Error: EXCEPTION_ACCESS_VIOLATION    
+        """
+        # In object mode, put the cursor over the button and release it.
+        # When it releases from the button, the error comes out
+        #col.operator("mesh.merge", text="Collapse").type = 'COLLAPSE'
+
         col.operator("jet_merge.btn", text="Collapse - " + get_hotkey(context, "mesh.merge")).type = "COLLAPSE"
         col.operator("mesh.f2", text="Dissolve Faces - " + get_hotkey(context, "mesh.f2"))
 
