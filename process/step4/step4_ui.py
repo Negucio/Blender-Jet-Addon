@@ -1,5 +1,5 @@
 import bpy
-from ... common_utils import apply_to_selected, any_mesh_obj_selected
+from ... common_utils import apply_to_selected, any_mesh_obj_selected, get_hotkey
 from . step4_utils import SharpToSeam, Unwrap, ManageSeam, triangulate, is_texture_atlas_enabled, enable_texture_atlas
 
 #Panel
@@ -37,7 +37,9 @@ class VIEW3D_PT_jet_step4(bpy.types.Panel):
 
         col = layout.column(align=True)
         col.operator("jet_sharp_to_seam.btn", text="Mark Sharp as Seam")
-        col.label("-Tag Seam Enable (Ctrl+RMB to Tag)")
+        col.prop(context.scene.Jet.tag, "seam",
+                 text="Tag Seam - " + get_hotkey(context, "mesh.shortest_path_pick"),
+                 icon="BLANK1")
 
         row = col.row(align=True)
         row.operator("jet_seam.btn", text="Mark Seam").mark = True

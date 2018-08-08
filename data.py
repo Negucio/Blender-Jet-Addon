@@ -13,6 +13,20 @@ class MeshPropertyGroup(bpy.types.PropertyGroup):
 class ObjectPropertyGroup(bpy.types.PropertyGroup):
     object = bpy.props.PointerProperty(name="object", type=bpy.types.Object)
 
+class TagEdgePropertyGroup(bpy.types.PropertyGroup):
+    def get_tag(self, type):
+        return bpy.context.scene.tool_settings.edge_path_mode == type
+
+    def set_tag(self, value, type):
+        bpy.context.scene.tool_settings.edge_path_mode = (type if value else 'SELECT')
+
+    sharp = bpy.props.BoolProperty(default=False,
+                                   get=lambda self: self.get_tag('SHARP'),
+                                   set=lambda self, value: self.set_tag(value, 'SHARP'))
+    seam = bpy.props.BoolProperty(default=False,
+                                   get=lambda self: self.get_tag('SEAM'),
+                                   set=lambda self, value: self.set_tag(value, 'SEAM'))
+
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
     list_low_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
 
@@ -25,6 +39,8 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 
     high_res = bpy.props.BoolProperty(options={'HIDDEN'}, default=False)
 
+    tag = bpy.props.PointerProperty(type=TagEdgePropertyGroup)
+
 
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
     object_id = property(get_id)
@@ -35,6 +51,7 @@ class ObjJetPropertyGroup(bpy.types.PropertyGroup):
 
 
 def register():
+    bpy.utils.register_class(TagEdgePropertyGroup)
     bpy.utils.register_class(MeshPropertyGroup)
     bpy.utils.register_class(ObjectPropertyGroup)
     bpy.utils.register_class(ObjIdPropertyGroup)
@@ -54,5 +71,6 @@ def unregister():
     bpy.utils.unregister_class(ObjIdPropertyGroup)
     bpy.utils.unregister_class(MeshPropertyGroup)
     bpy.utils.unregister_class(ObjectPropertyGroup)
+    bpy.utils.unregister_class(TagEdgePropertyGroup)
 
 

@@ -1,5 +1,5 @@
 import bpy
-from ... common_utils import apply_to_selected
+from ... common_utils import apply_to_selected, get_hotkey
 from . step3_utils import EnableAndConfigAutosmooth, ManageSharp
 
 #Panel
@@ -22,7 +22,11 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
         col.operator("object.shade_smooth", text="Smooth")
         col.operator("jet_autosmooth.btn", text="Enable Autosmooth")
         col.label("-Slider for AutoSmooth")
-        col.label("-Tag Sharp Enable (Ctrl+RMB to Tag)")
+
+        col.prop(context.scene.Jet.tag, "sharp",
+                 text="Tag Sharp - " + get_hotkey(context, "mesh.shortest_path_pick"),
+                 icon="BLANK1")
+
         row = col.row(align=True)
         row.operator("jet_sharp.btn", text="Mark Sharp").mark = True
         row.operator("jet_sharp.btn", text="Clear Sharp").mark = False
