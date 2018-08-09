@@ -25,7 +25,7 @@ def update_progress(job_title, progress, processingObj):
     sys.stdout.write(msg)
     sys.stdout.flush()
 
-def apply_to_selected(context, func, keep_selection = True, keep_active = True):
+def apply_to_selected(context, func, keep_selection = True, keep_active = True, value = None):
     sel_objs = context.selected_objects
     active_obj = context.active_object
     numObjs = len(sel_objs)
@@ -34,7 +34,7 @@ def apply_to_selected(context, func, keep_selection = True, keep_active = True):
     print("")
     for obj in sel_objs:
         try:
-            func(obj)
+            func(obj) if value is None else func(obj, value)
         except:
             break
 

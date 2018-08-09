@@ -41,6 +41,8 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 
     tag = bpy.props.PointerProperty(type=TagEdgePropertyGroup)
 
+    autosmooth = bpy.props.IntProperty(default=180, max=180, min=0)
+
 
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
     object_id = property(get_id)

@@ -1,9 +1,10 @@
 import bmesh
 
-def EnableAndConfigAutosmooth(obj):
-    if obj == None or obj.type != "MESH": return None
+def EnableAndConfigAutosmooth(obj, value=3.14159):
+    if obj is None or obj.type != "MESH":
+        return None
     obj.data.use_auto_smooth = True
-    obj.data.auto_smooth_angle = 3.14159    # 180 degrees (pi radians)
+    obj.data.auto_smooth_angle = value    # 180 degrees (pi radians)
 
 
 def ManageSharp(context, mark=True):

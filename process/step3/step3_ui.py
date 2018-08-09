@@ -20,8 +20,12 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
 
         col = layout.column(align=True)
         col.operator("object.shade_smooth", text="Smooth")
-        col.operator("jet_autosmooth.btn", text="Enable Autosmooth")
-        col.label("-Slider for AutoSmooth")
+
+        col.operator("jet_autosmooth.btn", text="Autosmooth 180º").angle = 180
+
+        row = col.row(align=True)
+        row.prop(context.scene.Jet, "autosmooth", text="Autosmooth angle")
+        row.operator("jet_autosmooth.btn", text="", icon="RIGHTARROW").angle = context.scene.Jet.autosmooth
 
         col.prop(context.scene.Jet.tag, "sharp",
                  text="Tag Sharp - " + get_hotkey(context, "mesh.shortest_path_pick"),
@@ -36,11 +40,18 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
 class VIEW3D_OT_jet_autosmooth(bpy.types.Operator):
     bl_idname = "jet_autosmooth.btn"
     bl_label = "Autosmooth"
-    bl_description = "Enable Autosmooth and set the smooth angle to 180"
+    bl_description = "Enable Autosmooth and apply the smooth angle to all selected objects"
+
+    angle = bpy.props.IntProperty(default=180)
+
+    @classmethod
+    def poll(cls, context):
+        return True
 
     def execute(self, context):
-        apply_to_selected(context, EnableAndConfigAutosmooth)
+        apply_to_selected(context, EnableAndConfigAutosmooth, value=self.angle*0.0174533)
         return {'FINISHED'}
+
 
 class VIEW3D_OT_jet_sharp(bpy.types.Operator):
     bl_idname = "jet_sharp.btn"
