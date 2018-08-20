@@ -4,7 +4,7 @@ from . step1_utils import SnapToFaces, SnapToVertices
 
 #Panel
 class VIEW3D_PT_jet_step1(bpy.types.Panel):
-    bl_label = "Step 1"
+    bl_label = "1. Retopology"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
@@ -38,11 +38,12 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.label("Retopology:")
 
         col = layout.column(align=True)
-        col.operator("jet_snap_faces.btn", text="Snap to face")
-        col.operator("jet_snap_vertices.btn", text="Snap to vertex")
+        row = col.row(align=True)
+        row.label("Snap to:")
+        row.operator("jet_snap_faces.btn", text="Face")
+        row.operator("jet_snap_vertices.btn", text="Vertex")
 
         col = layout.column(align=True)
         col.operator("object.shade_flat", text="Flat")
@@ -51,7 +52,7 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
         self.ice_tools(col, context)
 
         col = layout.column(align=True)
-        col.operator("mesh.dupli_extrude_cursor", text="Extrude to Cursor - " + get_hotkey(context, "mesh.dupli_extrude_cursor"))
+        col.operator("mesh.dupli_extrude_cursor", text="Extrude to Mouse - " + get_hotkey(context, "mesh.dupli_extrude_cursor"))
         col.operator("mesh.f2", text="MakeEdge/Face - " + get_hotkey(context, "mesh.f2"))
         col.operator("mesh.loopcut_slide", text="LoopCut and Slide - " + get_hotkey(context, "mesh.loopcut_slide"))
         col.operator("mesh.knife_tool", text="Knife - " + get_hotkey(context, "mesh.knife_tool"))
