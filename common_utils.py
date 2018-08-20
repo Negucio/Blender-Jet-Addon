@@ -68,9 +68,29 @@ def redraw():
 def get_addon_name():
     return bl_info["name"]
 
-def get_preferences():
+def get_preferences(context):
     addon_name = get_addon_name()
-    return bpy.context.user_preferences.addons[addon_name].preferences
+    return context.user_preferences.addons[addon_name].preferences
+
+def shorten_key_modifier(context, key):
+    if key == 'LEFTMOUSE':
+        return 'LMB'
+    elif key == 'RIGHTMOUSE':
+        return 'RMB'
+    elif key == 'MIDDLEMOUSE':
+        return 'MMB'
+    elif key == 'SELECTMOUSE':
+        if context.user_preferences.inputs.select_mouse == 'LEFT':
+            return 'LMB'
+        else:
+            return 'RMB'
+    elif key == 'ACTIONMOUSE':
+        if context.user_preferences.inputs.select_mouse == 'LEFT':
+            return'RMB'
+        else:
+            return 'LMB'
+    else:
+        return key
 
 def get_hotkey(context, keymap_item):
     wm = context.window_manager
@@ -109,9 +129,9 @@ def get_hotkey(context, keymap_item):
     if item.oskey:
         hotkey = hotkey + "OSkey+"
     if item.key_modifier != 'NONE':
-        hotkey = hotkey + item.key_modifier + "+"
+        hotkey = hotkey + shorten_key_modifier(context, item.key_modifier) + "+"
 
-    return hotkey + item.type
+    return hotkey + shorten_key_modifier(context, item.type)
 
 
 
