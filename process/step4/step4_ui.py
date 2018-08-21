@@ -4,7 +4,7 @@ from . step4_utils import SharpToSeam, Unwrap, ManageSeam, triangulate, is_textu
 
 #Panel
 class VIEW3D_PT_jet_step4(bpy.types.Panel):
-    bl_label = "Step 4"
+    bl_label = "4. UVs"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
@@ -33,12 +33,13 @@ class VIEW3D_PT_jet_step4(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
         #layout.enabled = len(context.selected_objects) > 0
-        layout.label("UVs")
 
         col = layout.column(align=True)
         col.operator("jet_sharp_to_seam.btn", text="Mark Sharp as Seam")
+
+        text = "Disable" if context.scene.Jet.tag.seam else "Enable"
         col.prop(context.scene.Jet.tag, "seam",
-                 text="Tag Seam - " + get_hotkey(context, "mesh.shortest_path_pick"),
+                 text=text + " Seam Tagging  - " + get_hotkey(context, "mesh.shortest_path_pick"),
                  icon="BLANK1")
 
         row = col.row(align=True)
