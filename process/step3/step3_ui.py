@@ -4,7 +4,7 @@ from . step3_utils import EnableAndConfigAutosmooth, ManageSharp
 
 #Panel
 class VIEW3D_PT_jet_step3(bpy.types.Panel):
-    bl_label = "Step 3"
+    bl_label = "3. Smooth/Sharp"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
@@ -16,7 +16,6 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.label("Smoothing and Sharpening")
 
         col = layout.column(align=True)
         col.operator("object.shade_smooth", text="Smooth")
@@ -27,8 +26,9 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
         row.prop(context.scene.Jet, "autosmooth", text="Autosmooth angle")
         row.operator("jet_autosmooth.btn", text="", icon="RIGHTARROW").angle = context.scene.Jet.autosmooth
 
+        text = "Disable" if context.scene.Jet.tag.sharp else "Enable"
         col.prop(context.scene.Jet.tag, "sharp",
-                 text="Tag Sharp - " + get_hotkey(context, "mesh.shortest_path_pick"),
+                 text=text + " Sharp Tagging - " + get_hotkey(context, "mesh.shortest_path_pick"),
                  icon="BLANK1")
 
         row = col.row(align=True)
