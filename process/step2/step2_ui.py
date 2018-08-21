@@ -3,7 +3,7 @@ from ... common_utils import get_hotkey
 
 #Panel
 class VIEW3D_PT_jet_step2(bpy.types.Panel):
-    bl_label = "Step 2"
+    bl_label = "2. Optimization"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
@@ -15,7 +15,6 @@ class VIEW3D_PT_jet_step2(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.label("Optimization")
 
         col = layout.column(align=True)
         col.operator("mesh.merge", text="Merge - " + get_hotkey(context, "mesh.merge"))
@@ -40,12 +39,8 @@ class VIEW3D_PT_jet_step2(bpy.types.Panel):
         col.operator("jet_merge.btn", text="Collapse - " + get_hotkey(context, "mesh.merge")).type = "COLLAPSE"
         col.operator("mesh.f2", text="Dissolve Faces - " + get_hotkey(context, "mesh.f2"))
 
-        col.operator("jet_delete_menu.btn", text="Delete Vertex - " + "X")
-        op = col.operator("mesh.dissolve_mode", text="Delete Vertex and keep mesh - " + get_hotkey(context, "mesh.dissolve_mode"))
-        op.use_verts=True
-        op.use_face_split = False
-        op.use_boundary_tear = False
-        op = col.operator("mesh.dissolve_mode", text="Delete Edge Loop - " + get_hotkey(context, "mesh.dissolve_mode"))
+        col.operator("jet_delete_menu.btn", text="Delete Element - " + "X or Del")
+        op = col.operator("mesh.dissolve_mode", text="Delete Element and keep mesh - " + get_hotkey(context, "mesh.dissolve_mode"))
         op.use_verts=True
         op.use_face_split = False
         op.use_boundary_tear = False
