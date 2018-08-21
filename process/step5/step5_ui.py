@@ -1,13 +1,12 @@
 import bpy
 import os.path
 from . step5_utils import apply_modifiers, remove_parent, Append, Switch
-from ... list.utils import draw_list
 from ... common_utils import apply_to_selected
 from . step5_classes import Decimate
 
 #Panel
 class VIEW3D_PT_jet_step5(bpy.types.Panel):
-    bl_label = "Step 5"
+    bl_label = "5. Model Preparation"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
@@ -19,21 +18,14 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
-        layout.label("Model Preparation")
-
-        data_path_low = "scene.Jet.list_low_res"
-        draw_list(context, data_path_low, layout, "Low-res", tuple_buttons=(True, False, True, True))
-        if len(context.scene.Jet.list_low_res.obj_list) > 0:
-            idx = context.scene.Jet.list_low_res.obj_list_index
-            data_path_high = "scene.Jet.list_low_res.obj_list[" + str(idx) + "].object.Jet.list_high_res"
-            draw_list(context, data_path_high, layout, "High-res", tuple_buttons=(True, False, True, True))
 
         col = layout.column(align=True)
         col.label("-Limitar subdivisiones")
+        col.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
+
         col.operator("jet_apply_decimate.btn", text="Apply Decimate")
         col.label("- % Decimate")
 
-        col.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
         col.label("-Aplicar restricciones y transformación visual")
         col.operator("jet_remove_parent.btn", text="Remove Parent")
 
@@ -41,7 +33,7 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         col.prop(context.scene.Jet, "optimized_res_file", text="Optimized")
         col.prop(context.scene.Jet, "high_res_file", text="Hi-Res")
 
-        op = col.operator("jet_append_opt_high.btn", text="Append")
+        op = col.operator("jet_append_opt_high.btn", text="Bring models to scene")
         op.optimized = context.scene.Jet.optimized_res_file
         op.high = context.scene.Jet.high_res_file
 
