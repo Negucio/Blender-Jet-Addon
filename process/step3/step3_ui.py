@@ -17,8 +17,11 @@ class VIEW3D_PT_jet_step3(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout
 
+        row = layout.row(align=True)
+        row.operator("jet_flat_smooth.btn", text="Flat").smooth=False
+        row.operator("jet_flat_smooth.btn", text="Smooth").smooth=True
+
         col = layout.column(align=True)
-        col.operator("object.shade_smooth", text="Smooth")
 
         col.operator("jet_autosmooth.btn", text="Autosmooth 180º").angle = 180
 

@@ -1,14 +1,12 @@
+from ... common_utils import select_obj_exclusive
 
-def SnapToFaces(scene):
-    scene.tool_settings.snap_element = 'FACE'
-    scene.tool_settings.use_snap_project = True
-    scene.tool_settings.use_snap_align_rotation = True
-    scene.tool_settings.use_snap_self = False
+def flat_smooth(obj, smooth):
+    select_obj_exclusive(obj)
+    mesh = obj.data
+    for f in mesh.polygons:
+        f.use_smooth = smooth
 
-def SnapToVertices(scene):
-    scene.tool_settings.snap_element = 'VERTEX'
-    scene.tool_settings.use_snap_align_rotation = False
-    scene.tool_settings.use_snap_self = False
+
 
 
 

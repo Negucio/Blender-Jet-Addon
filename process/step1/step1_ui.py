@@ -1,6 +1,7 @@
 import bpy
-from ... common_utils import get_hotkey
-from . step1_utils import SnapToFaces, SnapToVertices
+from ... common_utils import get_hotkey, apply_to_selected
+from . step1_utils import flat_smooth
+
 
 #Panel
 class VIEW3D_PT_jet_step1(bpy.types.Panel):
@@ -82,8 +83,9 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
         box = layout.box()
         self.snap(context, box)
 
-        col = layout.column(align=True)
-        col.operator("object.shade_flat", text="Flat")
+        row = layout.row(align=True)
+        row.operator("jet_flat_smooth.btn", text="Flat").smooth=False
+        row.operator("jet_flat_smooth.btn", text="Smooth").smooth=True
 
         col = layout.column(align=True)
         self.ice_tools(col, context)
@@ -98,45 +100,20 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
         col.operator("mesh.rip_move_fill", text="Rip Fill - " + get_hotkey(context, "mesh.rip_move_fill"))
 
 #Operators
-class VIEW3D_OT_jet_snap_faces(bpy.types.Operator):
-    bl_idname = "jet_snap_faces.btn"
-    bl_label = "Snap to face"
-    bl_description = "Project individual elements = True\nAlign rotation = True\nSnap onto itself = False"
+class VIEW3D_OT_jet_flat_smooth(bpy.types.Operator):
+    bl_idname = "jet_flat_smooth.btn"
+    bl_label = "Flat/Smooth"
+    bl_description = "Flat/Smooth"
+
+    smooth = bpy.props.BoolProperty(default=False)
 
     @classmethod
     def poll(cls, context):
         return True
 
     def execute(self, context):
-        SnapToFaces(context.scene)
+        apply_to_selected(context, flat_smooth, value=self.smooth)
         return {'FINISHED'}
-
-class VIEW3D_OT_jet_snap_vertices(bpy.types.Operator):
-    bl_idname = "jet_snap_vertices.btn"
-    bl_label = "Snap to vertex"
-    bl_description = "Align rotation = False\nSnap onto itself = True"
-
-    @classmethod
-    def poll(cls, context):
-        return True
-
-    def execute(self, context):
-        SnapToVertices(context.scene)
-        return {'FINISHED'}
-
-
-#class VIEW3D_OT_jet_flat_smooth(bpy.types.Operator):
-#    bl_idname = "jet_flat_smooth.btn"
-#    bl_label = "Flat/Smooth"
-#    bl_description = "Align rotation = False\nSnap onto itself = True"
-#
-#    @classmethod
-#    def poll(cls, context):
-#        return True
-#
-#    def execute(self, context):
-#        SnapToVertices(context.scene)
-#        return {'FINISHED'}
 
 
 
