@@ -1,6 +1,7 @@
 import bpy
 from ... common_utils import apply_to_selected, any_mesh_obj_selected, get_hotkey
-from .step4_utils import SharpToSeam, Unwrap, ManageSeam, triangulate, is_texture_atlas_enabled, enable_texture_atlas
+from .step4_utils import SharpToSeam, Unwrap, ManageSeam, triangulate, is_texture_atlas_enabled, enable_texture_atlas, \
+    select_objs_no_uvs
 
 
 def arrange_uvs(layout):
@@ -35,7 +36,9 @@ def uv_panel(layout, context):
     row.operator("jet_seam.btn", text="Clear Seam").mark = False
 
     row = layout.row()
-    row.operator("jet_unwrap.btn", text="Unwrap")
+    col = row.column(align=True)
+    col.operator("jet_unwrap.btn", text="Unwrap")
+    col.operator("jet_no_uvs.btn", text="Select objects without UVs")
 
     row = layout.row()
     col = row.column(align=True)
@@ -131,4 +134,15 @@ class VIEW3D_OT_jet_texture_atlas_on(bpy.types.Operator):
     def execute(self, context):
         enable_texture_atlas()
         return {'FINISHED'}
+
+
+class VIEW3D_OT_jet_no_uvs(bpy.types.Operator):
+    bl_idname = "jet_no_uvs.btn"
+    bl_label = "Select objects without UVs"
+    bl_description = "Select objects without UVs"
+
+    def execute(self, context):
+        select_objs_no_uvs(context)
+        return {'FINISHED'}
+
 

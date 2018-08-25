@@ -74,3 +74,10 @@ def triangulate(obj):
     bmesh.ops.triangulate(bm, faces=bm.faces)
 
     bpy.ops.object.mode_set(mode="OBJECT")
+
+
+def select_objs_no_uvs(context):
+    bpy.ops.object.mode_set(mode="OBJECT")
+    for obj in context.scene.objects:
+        obj.select = obj.type == 'MESH' and len(obj.data.uv_textures) == 0
+
