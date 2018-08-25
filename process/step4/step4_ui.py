@@ -98,7 +98,7 @@ class VIEW3D_PT_jet_step4_UVEditor(bpy.types.Panel):
         col.operator("jet_triangulate.btn", text="Triangulate")
 
 
-#Operators
+# Operators
 class VIEW3D_OT_jet_sharp_to_seam(bpy.types.Operator):
     bl_idname = "jet_sharp_to_seam.btn"
     bl_label = "Sharp to Seam"
@@ -108,14 +108,20 @@ class VIEW3D_OT_jet_sharp_to_seam(bpy.types.Operator):
         apply_to_selected(context, SharpToSeam)
         return {'FINISHED'}
 
+
 class VIEW3D_OT_jet_unwrap(bpy.types.Operator):
     bl_idname = "jet_unwrap.btn"
     bl_label = "Unwrap"
     bl_description = "Unwrap"
 
     def execute(self, context):
-        apply_to_selected(context, Unwrap)
+        obj = context.active_object
+        if obj is not None and obj.type == "MESH" and obj.mode == 'EDIT':
+            bpy.ops.wm.call_menu(name="VIEW3D_MT_uv_map")
+        else:
+            apply_to_selected(context, Unwrap)
         return {'FINISHED'}
+
 
 class VIEW3D_OT_jet_seam(bpy.types.Operator):
     bl_idname = "jet_seam.btn"
@@ -128,6 +134,7 @@ class VIEW3D_OT_jet_seam(bpy.types.Operator):
         ManageSeam(context, self.mark)
         return {'FINISHED'}
 
+
 class VIEW3D_OT_jet_triangulate(bpy.types.Operator):
     bl_idname = "jet_triangulate.btn"
     bl_label = "Triangulate"
@@ -136,6 +143,7 @@ class VIEW3D_OT_jet_triangulate(bpy.types.Operator):
     def execute(self, context):
         apply_to_selected(context, triangulate)
         return {'FINISHED'}
+
 
 class VIEW3D_OT_jet_texture_atlas_on(bpy.types.Operator):
     bl_idname = "jet_texture_atlas_on.btn"
