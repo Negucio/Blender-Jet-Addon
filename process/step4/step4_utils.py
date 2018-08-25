@@ -55,8 +55,6 @@ def Unwrap(obj):
     bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
     bpy.ops.object.mode_set(mode="OBJECT")
 
-
-
 def is_texture_atlas_enabled():
     is_enabled, is_loaded = check("uv_texture_atlas")
     return is_enabled

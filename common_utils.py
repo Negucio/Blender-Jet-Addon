@@ -25,9 +25,10 @@ def update_progress(job_title, progress, processingObj):
     sys.stdout.write(msg)
     sys.stdout.flush()
 
-def apply_to_selected(context, func, keep_selection = True, keep_active = True, value = None):
+def apply_to_selected(context, func, keep_mode = True, keep_selection = True, keep_active = True, value = None):
     sel_objs = context.selected_objects
     active_obj = context.active_object
+    mode = None if active_obj is None or active_obj.type != "MESH" else active_obj.mode
     numObjs = len(sel_objs)
     if numObjs == 0: return None
     count = 1
@@ -42,13 +43,15 @@ def apply_to_selected(context, func, keep_selection = True, keep_active = True, 
         count = count + 1
 
     bpy.ops.object.mode_set(mode="OBJECT")
-    bpy.ops.object.select_all(action='DESELECT')
+    #bpy.ops.object.select_all(action='DESELECT')
     if keep_selection:
         for obj in reversed(sel_objs):
             obj.select = True
     if keep_active:
-        if hasattr(bpy.context, "scene"):
-            bpy.context.scene.objects.active = active_obj
+        if hasattr(context, "scene"):
+            context.scene.objects.active = active_obj
+        if keep_mode and mode is not None:
+            bpy.ops.object.mode_set(mode=('EDIT' if mode=='EDIT' else 'OBJECT'))
 
 def get_mesh_objs_selected(context):
     return [obj for obj in context.selected_objects if obj.type == 'MESH']
