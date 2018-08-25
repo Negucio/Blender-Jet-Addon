@@ -1,6 +1,49 @@
 import bpy
 from ... common_utils import apply_to_selected, any_mesh_obj_selected, get_hotkey
-from . step4_utils import SharpToSeam, Unwrap, ManageSeam, triangulate, is_texture_atlas_enabled, enable_texture_atlas
+from .step4_utils import SharpToSeam, Unwrap, ManageSeam, triangulate, is_texture_atlas_enabled, enable_texture_atlas
+
+
+def arrange_uvs(layout):
+    layout.operator("uv.average_islands_scale", text="Average Islands Scale")
+    layout.operator("uv.pack_islands", text="Pack Islands")
+    layout.operator("scene.ms_remove_other_uv", text="Remove Other UVs")
+    layout.label("-Advanced Packing (Shot Packer Addon)")
+
+
+def texture_atlas(layout):
+    if not is_texture_atlas_enabled():
+        layout.label("Texture Atlas is not enabled", icon="ERROR")
+        layout.operator("jet_texture_atlas_on.btn", text="Enable Texture Atlas")
+    else:
+        layout.operator("scene.ms_add_lightmap_group", text="Start Texture Atlas").name = "TextureAtlas_Jet"
+        layout.operator("object.ms_run", text="Start Manual Unwrap")
+        arrange_uvs(layout)
+        layout.operator("object.ms_run_remove", text="Finish Manual Unwrap")
+
+
+def uv_panel(layout, context):
+    col = layout.column(align=True)
+    col.operator("jet_sharp_to_seam.btn", text="Mark Sharp as Seam")
+
+    text = "Disable" if context.scene.Jet.tag.seam else "Enable"
+    col.prop(context.scene.Jet.tag, "seam",
+             text=text + " Seam Tagging  - " + get_hotkey(context, "mesh.shortest_path_pick"),
+             icon="BLANK1")
+
+    row = col.row(align=True)
+    row.operator("jet_seam.btn", text="Mark Seam").mark = True
+    row.operator("jet_seam.btn", text="Clear Seam").mark = False
+
+    row = layout.row()
+    row.operator("jet_unwrap.btn", text="Unwrap")
+
+    row = layout.row()
+    col = row.column(align=True)
+    texture_atlas(col)
+
+    row = layout.row()
+    row.operator("jet_triangulate.btn", text="Triangulate")
+
 
 #Panel
 class VIEW3D_PT_jet_step4(bpy.types.Panel):
@@ -12,90 +55,25 @@ class VIEW3D_PT_jet_step4(bpy.types.Panel):
 
     @classmethod
     def poll(cls, context):
-        return any_mesh_obj_selected
-
-    def arrange_uvs(self, layout):
-        layout.operator("uv.average_islands_scale", text="Average Islands Scale")
-        layout.operator("uv.pack_islands", text="Pack Islands")
-        layout.operator("scene.ms_remove_other_uv", text="Remove Other UVs")
-        layout.label("-Advanced Packing (Shot Packer Addon)")
-
-    def texture_atlas(self, layout):
-        if not is_texture_atlas_enabled():
-            layout.label("Texture Atlas is not enabled", icon="ERROR")
-            layout.operator("jet_texture_atlas_on.btn", text="Enable Texture Atlas")
-        else:
-            layout.operator("scene.ms_add_lightmap_group", text="Start Texture Atlas").name = "TextureAtlas_Jet"
-            layout.operator("object.ms_run", text="Start Manual Unwrap")
-            self.arrange_uvs(layout)
-            layout.operator("object.ms_run_remove", text="Finish Manual Unwrap")
+        return True
 
     def draw(self, context):
-        layout = self.layout
-        #layout.enabled = len(context.selected_objects) > 0
-
-        col = layout.column(align=True)
-        col.operator("jet_sharp_to_seam.btn", text="Mark Sharp as Seam")
-
-        text = "Disable" if context.scene.Jet.tag.seam else "Enable"
-        col.prop(context.scene.Jet.tag, "seam",
-                 text=text + " Seam Tagging  - " + get_hotkey(context, "mesh.shortest_path_pick"),
-                 icon="BLANK1")
-
-        row = col.row(align=True)
-        row.operator("jet_seam.btn", text="Mark Seam").mark = True
-        row.operator("jet_seam.btn", text="Clear Seam").mark = False
-        col.operator("jet_unwrap.btn", text="Unwrap")
-
-        self.texture_atlas(col)
-
-        col.operator("jet_triangulate.btn", text="Triangulate")
+        uv_panel(self.layout, context)
 
 
 #Panel UV Editor
 class VIEW3D_PT_jet_step4_UVEditor(bpy.types.Panel):
-    bl_label = "Step 4"
+    bl_label = "4. UVs"
     bl_space_type = 'IMAGE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
 
     @classmethod
     def poll(cls, context):
-        return any_mesh_obj_selected
-
-    def arrange_uvs(self, layout):
-        layout.operator("uv.average_islands_scale", text="Average Islands Scale")
-        layout.operator("uv.pack_islands", text="Pack Islands")
-        layout.operator("scene.ms_remove_other_uv", text="Remove Other UVs")
-        layout.label("-Advanced Packing (Shot Packer Addon)")
-
-    def texture_atlas(self, layout):
-        if not is_texture_atlas_enabled():
-            layout.label("Texture Atlas is not enabled", icon="ERROR")
-            layout.operator("jet_texture_atlas_on.btn", text="Enable Texture Atlas")
-        else:
-            layout.operator("scene.ms_add_lightmap_group", text="Start Texture Atlas").name = "TextureAtlas_Jet"
-            layout.operator("object.ms_run", text="Start Manual Unwrap")
-            self.arrange_uvs(layout)
-            layout.operator("object.ms_run_remove", text="Finish Manual Unwrap")
+        return True
 
     def draw(self, context):
-        layout = self.layout
-        #layout.enabled = len(context.selected_objects) > 0
-        layout.label("UVs")
-
-        col = layout.column(align=True)
-        col.operator("jet_sharp_to_seam.btn", text="Mark Sharp as Seam")
-        col.label("-Tag Seam Enable (Ctrl+RMB to Tag)")
-
-        row = col.row(align=True)
-        row.operator("jet_seam.btn", text="Mark Seam").mark = True
-        row.operator("jet_seam.btn", text="Clear Seam").mark = False
-        col.operator("jet_unwrap.btn", text="Unwrap")
-
-        self.texture_atlas(col)
-
-        col.operator("jet_triangulate.btn", text="Triangulate")
+        uv_panel(self.layout, context)
 
 
 # Operators
