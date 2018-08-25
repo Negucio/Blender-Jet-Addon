@@ -1,6 +1,6 @@
 import bpy
 import os.path
-from . step5_utils import apply_modifiers, remove_parent, Append, Switch
+from . step5_utils import apply_modifiers, remove_parent, Append
 from ... common_utils import apply_to_selected
 from . step5_classes import Decimate
 
@@ -30,14 +30,21 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         col.operator("jet_remove_parent.btn", text="Remove Parent")
 
         col = layout.column(align=True)
-        col.prop(context.scene.Jet, "optimized_res_file", text="Optimized")
+        col.prop(context.scene.Jet, "optimized_res_file", text="Proxy")
         col.prop(context.scene.Jet, "high_res_file", text="Hi-Res")
 
+        hi =    (context.scene.Jet.high_res_file != "") and os.path.isfile(context.scene.Jet.high_res_file)
+        proxy = (context.scene.Jet.optimized_res_file != "") and os.path.isfile(context.scene.Jet.optimized_res_file)
+        row = col.row()
+        row.enabled = hi and proxy
         op = col.operator("jet_append_opt_high.btn", text="Bring models to scene")
         op.optimized = context.scene.Jet.optimized_res_file
         op.high = context.scene.Jet.high_res_file
 
-        col.operator("jet_switch_hi_opt.btn", text="Swap Optimized / High Resolution")
+        #col.operator("jet_switch_hi_opt.btn", text="Swap Optimized / High Resolution")
+        row = layout.row(align=True)
+        row.enabled = hi and proxy
+        row.prop(context.scene.Jet.swap, "model", expand=True)
 
 
 #Operators
@@ -71,22 +78,7 @@ class VIEW3D_OT_jet_append_opt_high(bpy.types.Operator):
 
     def execute(self, context):
         Append(context, self.optimized, self.high)
-        return {'FINISHED'}
-
-
-
-class VIEW3D_OT_jet_switch_hi_opt(bpy.types.Operator):
-    bl_idname = "jet_switch_hi_opt.btn"
-    bl_label = ""
-    bl_description = ""
-
-    @classmethod
-    def poll(cls, context):
-        return len(context.scene.Jet.opt_high_objs)>0
-
-    def execute(self, context):
-        context.scene.Jet.high_res = not context.scene.Jet.high_res
-        Switch(context.scene.Jet.opt_high_objs, context.scene.Jet.high_res)
+        context.scene.Jet.swap.model = 'proxy'
         return {'FINISHED'}
 
 

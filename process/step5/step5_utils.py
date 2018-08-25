@@ -71,10 +71,3 @@ def AppendObjects(blendfile, collection=None, link=False, fake_user=False):
                 item = collection.add()
                 item.object = o
 
-
-def Switch(objs, high):
-    for o in objs:
-        if high:
-            o.object.data = o.object.Jet.high_mesh
-        else:
-            o.object.data = o.object.Jet.opt_mesh

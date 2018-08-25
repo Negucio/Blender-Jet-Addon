@@ -64,6 +64,25 @@ class SnapPropertyGroup(bpy.types.PropertyGroup):
                                   get=lambda self: self.get_snap('FACE'),
                                   set=lambda self, value: self.set_snap(value, 'FACE'))
 
+class SwapPropertyGroup(bpy.types.PropertyGroup):
+    def swap(self, objs, high):
+        for o in objs:
+            if high:
+                o.object.data = o.object.Jet.high_mesh
+            else:
+                o.object.data = o.object.Jet.opt_mesh
+
+    def update_model(self, context):
+        j = context.scene.Jet
+        j.high_res = (j.swap.model=='hi')
+        self.swap(j.opt_high_objs, j.high_res)
+
+    model = bpy.props.EnumProperty(default='proxy', items=[
+                                    ('proxy', 'Proxy', 'Proxy'),
+                                    ('hi', 'Hi-Res', 'Hi-Res')],
+                                   update=lambda self, context: self.update_model(context))
+
+
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
     list_low_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
 
@@ -82,6 +101,8 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 
     snap = bpy.props.PointerProperty(type=SnapPropertyGroup)
 
+    swap = bpy.props.PointerProperty(type=SwapPropertyGroup)
+
 
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
     object_id = property(get_id)
@@ -93,6 +114,7 @@ class ObjJetPropertyGroup(bpy.types.PropertyGroup):
 
 def register():
     bpy.utils.register_class(SnapPropertyGroup)
+    bpy.utils.register_class(SwapPropertyGroup)
     bpy.utils.register_class(TagEdgePropertyGroup)
     bpy.utils.register_class(MeshPropertyGroup)
     bpy.utils.register_class(ObjectPropertyGroup)
@@ -114,6 +136,7 @@ def unregister():
     bpy.utils.unregister_class(MeshPropertyGroup)
     bpy.utils.unregister_class(ObjectPropertyGroup)
     bpy.utils.unregister_class(TagEdgePropertyGroup)
+    bpy.utils.unregister_class(SwapPropertyGroup)
     bpy.utils.unregister_class(SnapPropertyGroup)
 
 
