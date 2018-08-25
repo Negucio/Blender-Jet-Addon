@@ -7,9 +7,8 @@ def SnapToFaces(scene):
 
 def SnapToVertices(scene):
     scene.tool_settings.snap_element = 'VERTEX'
-    scene.tool_settings.use_snap_self = False
     scene.tool_settings.use_snap_align_rotation = False
-    scene.tool_settings.use_snap_self = True
+    scene.tool_settings.use_snap_self = False
 
 
 

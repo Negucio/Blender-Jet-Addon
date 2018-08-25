@@ -27,6 +27,46 @@ class TagEdgePropertyGroup(bpy.types.PropertyGroup):
                                    get=lambda self: self.get_tag('SEAM'),
                                    set=lambda self, value: self.set_tag(value, 'SEAM'))
 
+class SnapPropertyGroup(bpy.types.PropertyGroup):
+    def get_snap(self, type):
+        ts = bpy.context.scene.tool_settings
+        ret = True
+        if type == 'FACE':
+            ret = ret and ts.snap_element == type
+            ret = ret and ts.use_snap_project
+            ret = ret and ts.use_snap_align_rotation
+            ret = ret and not ts.use_snap_self
+        if type == 'VERTEX':
+            ret = ret and ts.snap_element == type
+            ret = ret and not ts.use_snap_align_rotation
+            ret = ret and not ts.use_snap_self
+
+        return ret
+
+    def set_snap(self, value, type):
+        ts = bpy.context.scene.tool_settings
+        if type == 'FACE':
+            ts.snap_element = type
+            ts.use_snap_project = True
+            ts.use_snap_align_rotation = True
+            ts.use_snap_self = False
+        if type == 'VERTEX':
+            ts.snap_element = type
+            ts.use_snap_align_rotation = False
+            ts.use_snap_self = False
+
+    vertex = bpy.props.BoolProperty(default=False,
+                                   get=lambda self: self.get_snap('VERTEX'),
+                                   set=lambda self, value: self.set_snap(value, 'VERTEX'))
+    face = bpy.props.BoolProperty(default=False,
+                                   get=lambda self: self.get_snap('FACE'),
+                                   set=lambda self, value: self.set_snap(value, 'FACE'))
+
+class FlatSmoothPropertyGroup(bpy.types.PropertyGroup):
+    flat = bpy.props.BoolProperty(default=False)
+    smooth = bpy.props.BoolProperty(default=False)
+
+
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
     list_low_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
 
@@ -43,6 +83,9 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 
     autosmooth = bpy.props.IntProperty(default=180, max=180, min=0)
 
+    snap = bpy.props.PointerProperty(type=SnapPropertyGroup)
+    flat_smooth = bpy.props.PointerProperty(type=FlatSmoothPropertyGroup)
+
 
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
     object_id = property(get_id)
@@ -53,6 +96,8 @@ class ObjJetPropertyGroup(bpy.types.PropertyGroup):
 
 
 def register():
+    bpy.utils.register_class(FlatSmoothPropertyGroup)
+    bpy.utils.register_class(SnapPropertyGroup)
     bpy.utils.register_class(TagEdgePropertyGroup)
     bpy.utils.register_class(MeshPropertyGroup)
     bpy.utils.register_class(ObjectPropertyGroup)
@@ -74,5 +119,7 @@ def unregister():
     bpy.utils.unregister_class(MeshPropertyGroup)
     bpy.utils.unregister_class(ObjectPropertyGroup)
     bpy.utils.unregister_class(TagEdgePropertyGroup)
+    bpy.utils.unregister_class(FlatSmoothPropertyGroup)
+    bpy.utils.unregister_class(SnapPropertyGroup)
 
 

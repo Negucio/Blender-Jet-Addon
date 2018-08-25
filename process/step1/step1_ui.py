@@ -14,6 +14,47 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
     def poll(cls, context):
         return True
 
+    def snap(self, context, layout):
+        obj = context.active_object
+        toolsettings = context.tool_settings
+
+        col = layout.column(align=True)
+        row = col.row(align=True)
+
+        text = "Snap" if toolsettings.use_snap else "No Snap - 'Ctrl to snap'"
+        row.prop(toolsettings, "use_snap", text=text)
+
+        row = col.row(align=True)
+        row.prop(context.scene.Jet.snap, "face", "Snap to face", toggle=True)
+        row.prop(context.scene.Jet.snap, "vertex", "Snap to vertex", toggle=True)
+
+        # Snap original
+        row_orig = layout.row()
+        show_snap = (obj is None) or (obj.mode not in {'SCULPT', 'VERTEX_PAINT', 'WEIGHT_PAINT', 'TEXTURE_PAINT'})
+        row_orig.enabled = show_snap
+        snap_element = toolsettings.snap_element
+        row = row_orig.row(align=True)
+        row.prop(toolsettings, "snap_element", icon_only=True)
+        if snap_element == 'INCREMENT':
+            row.prop(toolsettings, "use_snap_grid_absolute", text="")
+        else:
+            row.prop(toolsettings, "snap_target", text="")
+            if obj:
+                if obj.mode == 'EDIT':
+                    row.prop(toolsettings, "use_snap_self", text="")
+                if obj.mode in {'OBJECT', 'POSE', 'EDIT'} and snap_element != 'VOLUME':
+                    row.prop(toolsettings, "use_snap_align_rotation", text="")
+
+        if snap_element == 'VOLUME':
+            row.prop(toolsettings, "use_snap_peel_object", text="")
+        elif snap_element == 'FACE':
+            row.prop(toolsettings, "use_snap_project", text="")
+
+        # AutoMerge editing
+        # if obj:
+        #   if obj.mode == 'EDIT' and obj.type == 'MESH':
+        #       row_orig.prop(toolsettings, "use_mesh_automerge", text="", icon='AUTOMERGE_ON')
+
     def ice_tools(self, layout, context):
         box = layout.box()
         row_sw = box.row(align=True)
@@ -30,20 +71,16 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
         row_fv.operator("show_freeze_verts.retopo", "Show")
 
         if context.active_object is not None:
-            row_view = box.row(align=True)
-            row_view.alignment = 'EXPAND'
-            row_view.prop(context.object, "show_wire", toggle =False)
-            row_view.prop(context.object, "show_x_ray", toggle =False)
-            row_view.prop(context.space_data, "show_occlude_wire", toggle =False)
+            col = box.column(align=True)
+            #col.alignment = 'EXPAND'
+            col.prop(context.object, "show_wire", toggle=False)
+            col.prop(context.object, "show_x_ray", toggle=False)
+            col.prop(context.space_data, "show_occlude_wire", toggle=False)
 
     def draw(self, context):
         layout = self.layout
-
-        col = layout.column(align=True)
-        row = col.row(align=True)
-        row.label("Snap to:")
-        row.operator("jet_snap_faces.btn", text="Face")
-        row.operator("jet_snap_vertices.btn", text="Vertex")
+        box = layout.box()
+        self.snap(context, box)
 
         col = layout.column(align=True)
         col.operator("object.shade_flat", text="Flat")
@@ -86,6 +123,20 @@ class VIEW3D_OT_jet_snap_vertices(bpy.types.Operator):
     def execute(self, context):
         SnapToVertices(context.scene)
         return {'FINISHED'}
+
+
+#class VIEW3D_OT_jet_flat_smooth(bpy.types.Operator):
+#    bl_idname = "jet_flat_smooth.btn"
+#    bl_label = "Flat/Smooth"
+#    bl_description = "Align rotation = False\nSnap onto itself = True"
+#
+#    @classmethod
+#    def poll(cls, context):
+#        return True
+#
+#    def execute(self, context):
+#        SnapToVertices(context.scene)
+#        return {'FINISHED'}
 
 
 
