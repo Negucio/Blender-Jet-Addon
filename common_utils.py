@@ -25,22 +25,24 @@ def update_progress(job_title, progress, processingObj):
     sys.stdout.write(msg)
     sys.stdout.flush()
 
-def apply_to_selected(context, func, keep_mode = True, keep_selection = True, keep_active = True, value = None):
+def apply_to_selected(context, func, keep_mode = True, keep_selection = True, keep_active = True, value = None, verbose = False):
     sel_objs = context.selected_objects
     active_obj = context.active_object
     mode = None if active_obj is None or active_obj.type != "MESH" else active_obj.mode
     numObjs = len(sel_objs)
     if numObjs == 0: return None
-    count = 1
-    print("")
+    if verbose:
+        count = 1
+        print("")
     for obj in sel_objs:
         try:
             func(obj) if value is None else func(obj, value)
         except:
             break
 
-        update_progress(func.__name__, count / numObjs, obj.name)
-        count = count + 1
+        if verbose:
+            update_progress(func.__name__, count / numObjs, obj.name)
+            count = count + 1
 
     bpy.ops.object.mode_set(mode="OBJECT")
     #bpy.ops.object.select_all(action='DESELECT')
