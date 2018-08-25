@@ -34,15 +34,19 @@ def apply_to_selected(context, func, keep_mode = True, keep_selection = True, ke
     if verbose:
         count = 1
         print("")
-    for obj in sel_objs:
-        try:
-            func(obj) if value is None else func(obj, value)
-        except:
-            break
 
-        if verbose:
-            update_progress(func.__name__, count / numObjs, obj.name)
-            count = count + 1
+    if mode == 'EDIT':
+        func(active_obj) if value is None else func(active_obj, value)
+    else:
+        for obj in sel_objs:
+            try:
+                func(obj) if value is None else func(obj, value)
+            except:
+                break
+
+            if verbose:
+                update_progress(func.__name__, count / numObjs, obj.name)
+                count = count + 1
 
     bpy.ops.object.mode_set(mode="OBJECT")
     #bpy.ops.object.select_all(action='DESELECT')
