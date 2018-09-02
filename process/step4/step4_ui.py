@@ -60,6 +60,10 @@ class VIEW3D_PT_jet_step4(bpy.types.Panel):
     def poll(cls, context):
         return True
 
+    def draw_header(self, context):
+        layout = self.layout
+        layout.prop(context.scene.Jet.info, "uvs", text="", icon="INFO")
+
     def draw(self, context):
         uv_panel(self.layout, context)
 
@@ -70,6 +74,10 @@ class VIEW3D_PT_jet_step4_UVEditor(bpy.types.Panel):
     bl_space_type = 'IMAGE_EDITOR'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
+
+    def draw_header(self, context):
+        layout = self.layout
+        layout.prop(context.scene.Jet.info, "uvs", text="", icon="INFO")
 
     @classmethod
     def poll(cls, context):

@@ -9,6 +9,7 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
     bl_category = "Jet"
+    #bl_options = {'HIDE_HEADER'}
     bl_options = {'DEFAULT_CLOSED'}
 
     @classmethod
@@ -77,6 +78,11 @@ class VIEW3D_PT_jet_step1(bpy.types.Panel):
             col.prop(context.object, "show_wire", toggle=False)
             col.prop(context.object, "show_x_ray", toggle=False)
             col.prop(context.space_data, "show_occlude_wire", toggle=False)
+
+    def draw_header(self, context):
+        layout = self.layout
+        layout.prop(context.scene.Jet.info, "retopology", text="", icon="INFO")
+
 
     def draw(self, context):
         layout = self.layout

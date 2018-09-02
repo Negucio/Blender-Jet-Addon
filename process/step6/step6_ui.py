@@ -13,6 +13,10 @@ class VIEW3D_PT_jet_step6(bpy.types.Panel):
     def poll(cls, context):
         return True
 
+    def draw_header(self, context):
+        layout = self.layout
+        layout.prop(context.scene.Jet.info, "bake_sets_creation", text="", icon="INFO")
+
     def draw(self, context):
         layout = self.layout
 
