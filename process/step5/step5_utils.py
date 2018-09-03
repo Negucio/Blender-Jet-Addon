@@ -14,11 +14,11 @@ def remove_parent(obj):
     if not hasattr(obj, "parent"): return None
     obj.parent = None
 
-def Append(context, optimized, high):
-    AppendMeshes(optimized, collection=context.scene.Jet.opt_meshes, link=True)
-    AppendObjects(optimized, collection=context.scene.Jet.opt_high_objs, link=False)
+def append(context, optimized, high):
+    append_meshes(optimized, collection=context.scene.Jet.opt_meshes, link=True)
+    append_objects(optimized, collection=context.scene.Jet.opt_high_objs, link=False)
 
-    AppendMeshes(high, collection=context.scene.Jet.high_meshes, link=True)
+    append_meshes(high, collection=context.scene.Jet.high_meshes, link=True)
 
     for o in context.scene.Jet.opt_high_objs:
         o.object.Jet.opt_mesh = o.object.data
@@ -27,7 +27,7 @@ def Append(context, optimized, high):
                 o.object.Jet.high_mesh = m.mesh
 
 
-def AppendMeshes(blendfile, collection=None, link=False, fake_user=False):
+def append_meshes(blendfile, collection=None, link=False, fake_user=False):
     section = '\\' + 'Mesh' + '\\'
     imported = []
 
@@ -49,7 +49,7 @@ def AppendMeshes(blendfile, collection=None, link=False, fake_user=False):
                 item = collection.add()
                 item.mesh = m
 
-def AppendObjects(blendfile, collection=None, link=False, fake_user=False):
+def append_objects(blendfile, collection=None, link=False, fake_user=False):
     section = '\\' + 'Object' + '\\'
     imported = []
 
@@ -71,3 +71,48 @@ def AppendObjects(blendfile, collection=None, link=False, fake_user=False):
                 item = collection.add()
                 item.object = o
 
+def assign_subsurf(obj, subs=2):
+    if obj is None or obj.type != "MESH": return None
+    select_obj_exclusive(obj)
+
+    subsurf_list = [m for m in obj.modifiers if m.type == "SUBSURF"]
+    n = len(subsurf_list)
+    subsurf = subsurf_list[n-1] if (n > 0) else obj.modifiers.new("subsurf_Jet", 'SUBSURF')
+
+    subsurf.show_only_control_edges = True
+    subsurf.levels = subs
+    subsurf.render_levels = subs
+
+def apply_transform_constraints(obj):
+    if obj is None or obj.type != "MESH": return None
+    select_obj_exclusive(obj)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+
+
+def assign_decimate(obj, ratio=0.1):
+    if obj is None or obj.type != "MESH": return None
+    select_obj_exclusive(obj)
+
+    dec_list = [m for m in obj.modifiers if m.type == "DECIMATE"]
+    n = len(dec_list)
+    dec = dec_list[0] if (n > 0) else obj.modifiers.new("decimate_Jet", 'DECIMATE')
+
+    # Collapse
+    dec.decimate_type = 'COLLAPSE'
+    dec.ratio = ratio
+
+    # Un-Subdivide
+    # dec.decimate_type = 'UNSUBDIV'
+    # dec.iterations = 2
+
+    # Planar
+    # dec.decimate_type = 'DISSOLVE'
+    # dec.angle_limit = 1.309     #75 grados en radianes
+
+def apply_decimate(obj):
+    if obj is None or obj.type != "MESH": return None
+    select_obj_exclusive(obj)
+
+    for mod in obj.modifiers:
+        if mod.type == 'DECIMATE':
+            bpy.ops.object.modifier_apply(modifier=mod.name)

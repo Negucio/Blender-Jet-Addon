@@ -198,6 +198,10 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 
     autosmooth = bpy.props.IntProperty(default=180, max=180, min=0)
 
+    decimate_ratio = bpy.props.IntProperty(default=10, max=100, min=0)
+
+    subdivisions = bpy.props.IntProperty(default=2, max=10, min=0)
+
     snap = bpy.props.PointerProperty(type=SnapPropertyGroup)
 
     swap = bpy.props.PointerProperty(type=SwapPropertyGroup)

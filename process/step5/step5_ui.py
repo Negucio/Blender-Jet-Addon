@@ -1,8 +1,8 @@
 import bpy
 import os.path
-from . step5_utils import apply_modifiers, remove_parent, Append
+from .step5_utils import apply_modifiers, remove_parent, append, apply_decimate, assign_decimate, assign_subsurf, \
+    apply_transform_constraints
 from ... common_utils import apply_to_selected
-from . step5_classes import Decimate
 
 #Panel
 class VIEW3D_PT_jet_step5(bpy.types.Panel):
@@ -24,13 +24,23 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         layout = self.layout
 
         col = layout.column(align=True)
-        col.label("-Limitar subdivisiones")
+        row = col.row(align=True)
+        row.prop(context.scene.Jet, "subdivisions", text="Subbdivisions")
+        row.operator("jet_assign_subsurf.btn", text="", icon="RIGHTARROW").subdiv = context.scene.Jet.subdivisions
+
+        col = layout.column(align=True)
         col.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
 
-        col.operator("jet_apply_decimate.btn", text="Apply Decimate")
-        col.label("- % Decimate")
+        col = layout.column(align=True)
+        row = col.row(align=True)
+        row.prop(context.scene.Jet, "decimate_ratio", text="Decimate Ratio")
+        row.operator("jet_assign_decimate.btn", text="", icon="RIGHTARROW").ratio = context.scene.Jet.decimate_ratio
+        row = col.row(align=True)
+        row.operator("jet_apply_decimate.btn", text="Apply Decimate")
 
-        col.label("-Aplicar restricciones y transformación visual")
+        col = layout.column(align=True)
+        col.operator("jet_apply_transf_constraints.btn", text="Apply Transf & Constraints")
+        col = layout.column(align=True)
         col.operator("jet_remove_parent.btn", text="Remove Parent")
 
         col = layout.column(align=True)
@@ -52,21 +62,6 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
 
 
 #Operators
-#col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
-#col.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
-#class VIEW3D_OT_jet_add_sufix(bpy.types.Operator):
-#    bl_idname = "jet_add_sufix.btn"
-#    bl_label = "Add sufix"
-#    bl_description = "Add sufix to the selected objects"
-#
-#    sufix = bpy.props.StringProperty(name="sufix",default="_Low")
-#
-#    def execute(self, context):
-#        for obj in context.selected_objects:
-#            if self.sufix in obj.name: continue
-#            obj.name = obj.name + self.sufix
-#        return {'FINISHED'}
-
 class VIEW3D_OT_jet_append_opt_high(bpy.types.Operator):
     bl_idname = "jet_append_opt_high.btn"
     bl_label = ""
@@ -81,7 +76,7 @@ class VIEW3D_OT_jet_append_opt_high(bpy.types.Operator):
         return hi and ((context.scene.Jet.optimized_res_file != "") and os.path.isfile(context.scene.Jet.optimized_res_file))
 
     def execute(self, context):
-        Append(context, self.optimized, self.high)
+        append(context, self.optimized, self.high)
         context.scene.Jet.swap.model = 'proxy'
         return {'FINISHED'}
 
@@ -105,26 +100,68 @@ class VIEW3D_OT_jet_remove_parent(bpy.types.Operator):
         apply_to_selected(context, remove_parent)
         return {'FINISHED'}
 
-
 class VIEW3D_OT_jet_assign_decimate(bpy.types.Operator):
     bl_idname = "jet_assign_decimate.btn"
-    bl_label = "Assign Decimate"
-    bl_description = "Assign Decimate modifier to selected objects"
+    bl_label = "Assign decimate"
+    bl_description = "Assign decimate and/or set the ratio in all selected objects"
 
-    decimate = Decimate()
+    ratio = bpy.props.IntProperty(default=10)
+
+    @classmethod
+    def poll(cls, context):
+        return True
 
     def execute(self, context):
-        apply_to_selected(context, self.decimate.AssignDecimate)
+        apply_to_selected(context, assign_decimate, value=self.ratio/100)
+        return {'FINISHED'}
+
+
+class VIEW3D_OT_jet_assign_subsurf(bpy.types.Operator):
+    bl_idname = "jet_assign_subsurf.btn"
+    bl_label = "Assign subsurf"
+    bl_description = "Assign subsurf and/or set the subdivisions in all selected objects"
+
+    subdiv = bpy.props.IntProperty(default=2)
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        apply_to_selected(context, assign_subsurf, value=self.subdiv)
         return {'FINISHED'}
 
 
 class VIEW3D_OT_jet_apply_decimate(bpy.types.Operator):
     bl_idname = "jet_apply_decimate.btn"
     bl_label = "Apply Decimate"
-    bl_description = "Apply Decimate modifier to selected objects"
-
-    decimate = Decimate()
+    bl_description = "Apply Decimate modifier in all selected objects"
 
     def execute(self, context):
-        apply_to_selected(context, self.decimate.ApplyDecimate)
+        apply_to_selected(context, apply_decimate)
         return {'FINISHED'}
+
+
+class VIEW3D_OT_jet_apply_transf_constraints(bpy.types.Operator):
+    bl_idname = "jet_apply_transf_constraints.btn"
+    bl_label = "Apply Transform and Constraints"
+    bl_description = "Apply Transform and Constraints in all selected objects"
+
+    def execute(self, context):
+        apply_to_selected(context, apply_transform_constraints)
+        return {'FINISHED'}
+
+#col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
+#col.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
+#class VIEW3D_OT_jet_add_sufix(bpy.types.Operator):
+#    bl_idname = "jet_add_sufix.btn"
+#    bl_label = "Add sufix"
+#    bl_description = "Add sufix to the selected objects"
+#
+#    sufix = bpy.props.StringProperty(name="sufix",default="_Low")
+#
+#    def execute(self, context):
+#        for obj in context.selected_objects:
+#            if self.sufix in obj.name: continue
+#            obj.name = obj.name + self.sufix
+#        return {'FINISHED'}
