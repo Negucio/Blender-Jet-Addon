@@ -4,6 +4,10 @@ from .step5_utils import apply_modifiers, remove_parent, append, apply_decimate,
     apply_transform_constraints
 from ... common_utils import apply_to_selected
 
+from bpy_extras.io_utils import ImportHelper
+from bpy.props import StringProperty
+from bpy.types import Operator
+
 #Panel
 class VIEW3D_PT_jet_step5(bpy.types.Panel):
     bl_label = "5. Model Preparation"
@@ -44,8 +48,12 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         col.operator("jet_remove_parent.btn", text="Remove Parent")
 
         col = layout.column(align=True)
-        col.prop(context.scene.Jet, "optimized_res_file", text="Proxy")
-        col.prop(context.scene.Jet, "high_res_file", text="Hi-Res")
+        row = col.row(align=True)
+        row.prop(context.scene.Jet, "optimized_res_file", text="Proxy")
+        row.operator("load_blend.btn", text="", icon="FILESEL").attr = "optimized_res_file"
+        row = col.row(align=True)
+        row.prop(context.scene.Jet, "high_res_file", text="Hi-Res")
+        row.operator("load_blend.btn", text="", icon="FILESEL").attr = "high_res_file"
 
         hi =    (context.scene.Jet.high_res_file != "") and os.path.isfile(context.scene.Jet.high_res_file)
         proxy = (context.scene.Jet.optimized_res_file != "") and os.path.isfile(context.scene.Jet.optimized_res_file)
@@ -149,6 +157,25 @@ class VIEW3D_OT_jet_apply_transf_constraints(bpy.types.Operator):
 
     def execute(self, context):
         apply_to_selected(context, apply_transform_constraints)
+        return {'FINISHED'}
+
+
+class VIEW3D_OT_jet_load_blend_file(Operator, ImportHelper):
+    bl_idname = "load_blend.btn"
+    bl_label = "Load blend dialog"
+
+    filename_ext = ".blend"
+
+    filter_glob = StringProperty(
+            default="*.blend",
+            options={'HIDDEN'},
+            maxlen=255)
+
+    attr = StringProperty(default="",
+                          options={'HIDDEN'})
+
+    def execute(self, context):
+        setattr(context.scene.Jet, self.attr, self.filepath)
         return {'FINISHED'}
 
 #col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"

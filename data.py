@@ -61,7 +61,9 @@ class SnapPropertyGroup(bpy.types.PropertyGroup):
                                     get=lambda self: self.get_snap('VERTEX'),
                                     set=lambda self, value: self.set_snap(value, 'VERTEX'))
     face = bpy.props.BoolProperty(default=False,
-                                  description="Project individual elements = True\nAlign rotation = True\nSnap onto itself = False",
+                                  description="Project individual elements = True\n" + \
+                                              "Align rotation = True\n" + \
+                                              "Snap onto itself = False",
                                   get=lambda self: self.get_snap('FACE'),
                                   set=lambda self, value: self.set_snap(value, 'FACE'))
 
@@ -185,7 +187,7 @@ class InfoPropertyGroup(bpy.types.PropertyGroup):
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
     list_low_res = bpy.props.PointerProperty(type=LowObjListPropertyGroup)
 
-    high_res_file = bpy.props.StringProperty(name="", default="", subtype="FILE_PATH")
+    high_res_file = bpy.props.StringProperty(name="", default="")
     optimized_res_file = bpy.props.StringProperty(name="", default="", subtype="FILE_PATH")
 
     opt_high_objs = bpy.props.CollectionProperty(type=ObjectPropertyGroup)
