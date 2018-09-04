@@ -1,7 +1,7 @@
 import bpy
 import os
 from . common_utils import get_id
-from . list.data import ObjListPropertyGroup
+from . list.data import HiObjListPropertyGroup, LowObjListPropertyGroup
 from . draw import Draw
 
 class ObjIdPropertyGroup(bpy.types.PropertyGroup):
@@ -181,9 +181,9 @@ class InfoPropertyGroup(bpy.types.PropertyGroup):
         description="Press to display information about Bake Sets Creation process",
         update=lambda self, context: self.update(context, "bake_sets_creation"))
 
-
+#Scene
 class ScnJetPropertyGroup(bpy.types.PropertyGroup):
-    list_low_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
+    list_low_res = bpy.props.PointerProperty(type=LowObjListPropertyGroup)
 
     high_res_file = bpy.props.StringProperty(name="", default="", subtype="FILE_PATH")
     optimized_res_file = bpy.props.StringProperty(name="", default="", subtype="FILE_PATH")
@@ -208,10 +208,9 @@ class ScnJetPropertyGroup(bpy.types.PropertyGroup):
 
     info = bpy.props.PointerProperty(type=InfoPropertyGroup)
 
-
+#Object
 class ObjJetPropertyGroup(bpy.types.PropertyGroup):
-    object_id = property(get_id)
-    list_high_res = bpy.props.PointerProperty(type=ObjListPropertyGroup)
+    list_high_res = bpy.props.PointerProperty(type=HiObjListPropertyGroup)
 
     opt_mesh = bpy.props.PointerProperty(type=bpy.types.Mesh)
     high_mesh = bpy.props.PointerProperty(type=bpy.types.Mesh)
@@ -229,7 +228,6 @@ def register():
 
     bpy.types.Scene.Jet = bpy.props.PointerProperty(options={'HIDDEN'}, type=ScnJetPropertyGroup)
     bpy.types.Object.Jet = bpy.props.PointerProperty(options={'HIDDEN'}, type=ObjJetPropertyGroup)
-
 
 def unregister():
     del bpy.types.Scene.Jet

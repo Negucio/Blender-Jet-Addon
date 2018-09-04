@@ -1,4 +1,4 @@
-from . data import ObjPropertyGroup, ObjListPropertyGroup
+from . data import ObjPropertyGroup, LowObjListPropertyGroup, HiObjListPropertyGroup
 from bpy.utils import register_class, unregister_class
 
 from . obj_list import \
@@ -11,7 +11,8 @@ from . obj_list import \
 
 def register():
     register_class(ObjPropertyGroup)
-    register_class(ObjListPropertyGroup)
+    register_class(LowObjListPropertyGroup)
+    register_class(HiObjListPropertyGroup)
 
     register_class(DATA_OT_obj_list_add)
     register_class(DATA_OT_obj_list_remove)
@@ -29,5 +30,6 @@ def unregister():
     unregister_class(DATA_OT_obj_list_clear)
     unregister_class(DATA_UL_obj_list)
 
-    unregister_class(ObjListPropertyGroup)
+    unregister_class(LowObjListPropertyGroup)
+    unregister_class(HiObjListPropertyGroup)
     unregister_class(ObjPropertyGroup)
