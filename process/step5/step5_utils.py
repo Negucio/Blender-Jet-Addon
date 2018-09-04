@@ -60,16 +60,23 @@ def append_objects(blendfile, collection=None, link=False, fake_user=False):
             imported.append(obj)
         bpy.ops.wm.append(directory=blendfile + section, files=files, link=link, set_fake=True)
 
+    not_mesh = []
     for o in bpy.data.objects:
         cond = o.name in imported
         if link:
             cond = cond and (blendfile == o.library.filepath)
         if cond:
+            if o.type != 'MESH':
+                not_mesh.append(o)
+                continue
             if fake_user:
                 o.use_fake_user = True
             if collection is not None:
                 item = collection.add()
                 item.object = o
+
+    for o in not_mesh:
+        bpy.data.objects.remove(o, True)
 
 def assign_subsurf(obj, subs=2):
     if obj is None or obj.type != "MESH": return None
