@@ -49,6 +49,10 @@ class ObjQuantityOperator(ListOperator):
         prop = self.get_prop(context, self.data_path)
         # Index of the selected item in the list
         obj_idx = prop.obj_list_index
+
+        new_idx = 0 if obj_idx < 1 else obj_idx-1
+        prop.obj_list_index = new_idx
+
         # The selected item is removed from the list
         prop.obj_list.remove(obj_idx)
 
