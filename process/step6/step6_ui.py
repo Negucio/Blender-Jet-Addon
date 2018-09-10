@@ -1,5 +1,4 @@
 import bpy
-from ... list.utils import draw_list
 
 #Panel
 class VIEW3D_PT_jet_step6(bpy.types.Panel):
@@ -17,15 +16,62 @@ class VIEW3D_PT_jet_step6(bpy.types.Panel):
         layout = self.layout
         layout.prop(context.scene.Jet.info, "bake_sets_creation", text="", icon="INFO")
 
+    def draw_list(self, list_prop, list_name, layout, tuple_buttons=(True, True, True, True)):
+        box = layout.box()
+        row = box.row()
+
+        split = row.split(percentage=0.6)
+        split.label(text=list_name + ' contents')
+        split = split.split()
+        split.prop(list_prop, "obj_list")
+
+        row = box.row()
+        row.template_list("DATA_UL_jet_list_" + list_name, "",
+                          list_prop, 'obj_list',
+                          list_prop, 'obj_list_index',
+                          rows=1, maxrows=5)
+
+        has_objs = len(list_prop.obj_list)>0
+
+        col = box.column(align=True)
+        row = col.row(align=True)
+        if tuple_buttons[0]:
+            col_assign = row.column(align=True)
+            col_assign.operator(list_name + "_obj_list_add.btn", text="Assign")
+            col_remove = row.column(align=True)
+            col_remove.enabled = has_objs
+            col_remove.operator(list_name + "_obj_list_remove.btn", text="Remove")
+
+        if tuple_buttons[1]:
+            row = col.row(align=True)
+            row.enabled = has_objs
+            row.operator(list_name + "_obj_list_clear.btn", text="Clear")
+
+        if tuple_buttons[2]:
+            row = col.row(align=True)
+            row.enabled = has_objs
+            row.operator(list_name + "_obj_list_select.btn", text="Select All").select = True
+            row.operator(list_name + "_obj_list_select.btn", text="Deselect All").select = False
+
+        if tuple_buttons[3]:
+            row = col.row(align=True)
+            row.enabled = has_objs
+            row.operator(list_name + "_obj_list_hide.btn", text="Show All").hide = False
+            row.operator(list_name + "_obj_list_hide.btn", text="Hide All").hide = True
+
+
     def draw(self, context):
         layout = self.layout
 
-        data_path_low = "scene.Jet.list_low_res"
-        draw_list(context, data_path_low, layout, "Low-res", tuple_buttons=(True, False, True, True))
-        if len(context.scene.Jet.list_low_res.obj_list) > 0:
-            idx = context.scene.Jet.list_low_res.obj_list_index
-            data_path_high = "scene.Jet.list_low_res.obj_list[" + str(idx) + "].object.Jet.list_high_res"
-            draw_list(context, data_path_high, layout, "High-res", tuple_buttons=(True, False, True, True))
+        low_res = context.scene.Jet.list_low_res
+        self.draw_list(low_res, "low_res", layout, tuple_buttons=(True, False, True, True))
+
+        if len(low_res.obj_list) > 0:
+            layout.prop(low_res, "select_hi_rest_list", "Select Hi-Res automatically", icon="TRIA_DOWN")
+            idx = low_res.obj_list_index
+
+            hi_res = low_res.obj_list[idx].object.Jet.list_high_res
+            self.draw_list(hi_res, "hi_res", layout, tuple_buttons=(True, False, True, True))
 
 
 #Operators

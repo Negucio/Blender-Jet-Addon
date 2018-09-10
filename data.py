@@ -1,6 +1,8 @@
 import bpy
 import os
-from . list.data import HiObjListPropertyGroup, LowObjListPropertyGroup
+
+from . list.list_utils import get_hi_res_prop
+from . list.list_data import HiObjListPropertyGroup, LowObjListPropertyGroup
 from . draw import Draw
 from bpy.props import StringProperty, PointerProperty, BoolProperty, \
                       IntProperty, EnumProperty, CollectionProperty
@@ -16,6 +18,10 @@ class MeshPropertyGroup(PropertyGroup):
 
 class ObjectPropertyGroup(PropertyGroup):
     object = PointerProperty(name="object", type=Object)
+
+class ActivePropertyGroup(PropertyGroup):
+    object = PointerProperty(type=Object)
+    select = BoolProperty(default=False)
 
 class TagEdgePropertyGroup(PropertyGroup):
     def get_tag(self, type):
@@ -203,6 +209,8 @@ class ScnJetPropertyGroup(PropertyGroup):
 
     info = PointerProperty(type=InfoPropertyGroup)
 
+    active = PointerProperty(type=ActivePropertyGroup)
+
 #Object
 class ObjJetPropertyGroup(PropertyGroup):
     list_high_res = PointerProperty(type=HiObjListPropertyGroup)
@@ -217,6 +225,7 @@ def register():
     register_class(TagEdgePropertyGroup)
     register_class(MeshPropertyGroup)
     register_class(ObjectPropertyGroup)
+    register_class(ActivePropertyGroup)
     register_class(ObjIdPropertyGroup)
     register_class(ObjJetPropertyGroup)
     register_class(ScnJetPropertyGroup)
@@ -232,6 +241,7 @@ def unregister():
     unregister_class(ObjJetPropertyGroup)
     unregister_class(ObjIdPropertyGroup)
     unregister_class(MeshPropertyGroup)
+    unregister_class(ActivePropertyGroup)
     unregister_class(ObjectPropertyGroup)
     unregister_class(TagEdgePropertyGroup)
     unregister_class(SwapPropertyGroup)

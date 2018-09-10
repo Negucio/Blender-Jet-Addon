@@ -11,14 +11,16 @@ bl_info = {
     "category": "3D View"}
 
 import bpy
-from . import data, ui
+from . import data, ui, handler
 
 def register():
     ui.register()
     data.register()
+    handler.register()
 
 
 def unregister():
+    handler.unregister()
     data.unregister()
     ui.unregister()
     bpy.utils.unregister_module(__name__)
