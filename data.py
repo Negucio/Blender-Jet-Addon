@@ -1,34 +1,37 @@
 import bpy
 import os
-from . common_utils import get_id
 from . list.data import HiObjListPropertyGroup, LowObjListPropertyGroup
 from . draw import Draw
+from bpy.props import StringProperty, PointerProperty, BoolProperty, \
+                      IntProperty, EnumProperty, CollectionProperty
+from bpy.types import PropertyGroup, Object, Mesh, Scene
+from bpy.utils import register_class, unregister_class
 
-class ObjIdPropertyGroup(bpy.types.PropertyGroup):
-    id = bpy.props.StringProperty(name="id", default="Id")
-    object = bpy.props.StringProperty(name="object name", default="Object")
+class ObjIdPropertyGroup(PropertyGroup):
+    id = StringProperty(name="id", default="Id")
+    object = StringProperty(name="object name", default="Object")
 
-class MeshPropertyGroup(bpy.types.PropertyGroup):
-    mesh = bpy.props.PointerProperty(name="mesh", type=bpy.types.Mesh)
+class MeshPropertyGroup(PropertyGroup):
+    mesh = PointerProperty(name="mesh", type=Mesh)
 
-class ObjectPropertyGroup(bpy.types.PropertyGroup):
-    object = bpy.props.PointerProperty(name="object", type=bpy.types.Object)
+class ObjectPropertyGroup(PropertyGroup):
+    object = PointerProperty(name="object", type=Object)
 
-class TagEdgePropertyGroup(bpy.types.PropertyGroup):
+class TagEdgePropertyGroup(PropertyGroup):
     def get_tag(self, type):
         return bpy.context.scene.tool_settings.edge_path_mode == type
 
     def set_tag(self, value, type):
         bpy.context.scene.tool_settings.edge_path_mode = (type if value else 'SELECT')
 
-    sharp = bpy.props.BoolProperty(default=False,
+    sharp = BoolProperty(default=False,
                                    get=lambda self: self.get_tag('SHARP'),
                                    set=lambda self, value: self.set_tag(value, 'SHARP'))
-    seam = bpy.props.BoolProperty(default=False,
+    seam = BoolProperty(default=False,
                                    get=lambda self: self.get_tag('SEAM'),
                                    set=lambda self, value: self.set_tag(value, 'SEAM'))
 
-class SnapPropertyGroup(bpy.types.PropertyGroup):
+class SnapPropertyGroup(PropertyGroup):
     def get_snap(self, type):
         ts = bpy.context.scene.tool_settings
         ret = True
@@ -56,18 +59,18 @@ class SnapPropertyGroup(bpy.types.PropertyGroup):
             ts.use_snap_align_rotation = False
             ts.use_snap_self = False
 
-    vertex = bpy.props.BoolProperty(default=False,
+    vertex = BoolProperty(default=False,
                                     description="Align rotation = False\nSnap onto itself = True",
                                     get=lambda self: self.get_snap('VERTEX'),
                                     set=lambda self, value: self.set_snap(value, 'VERTEX'))
-    face = bpy.props.BoolProperty(default=False,
+    face = BoolProperty(default=False,
                                   description="Project individual elements = True\n" + \
                                               "Align rotation = True\n" + \
                                               "Snap onto itself = False",
                                   get=lambda self: self.get_snap('FACE'),
                                   set=lambda self, value: self.set_snap(value, 'FACE'))
 
-class SwapPropertyGroup(bpy.types.PropertyGroup):
+class SwapPropertyGroup(PropertyGroup):
     def swap(self, objs, high):
         for o in objs:
             if high:
@@ -80,14 +83,14 @@ class SwapPropertyGroup(bpy.types.PropertyGroup):
         j.high_res = (j.swap.model=='hi')
         self.swap(j.opt_high_objs, j.high_res)
 
-    model = bpy.props.EnumProperty(default='proxy', items=[
+    model = EnumProperty(default='proxy', items=[
                                     ('proxy', 'Proxy', 'Proxy'),
                                     ('hi', 'Hi-Res', 'Hi-Res')],
                                    update=lambda self, context: self.update_model(context))
 
-class InfoPropertyGroup(bpy.types.PropertyGroup):
+class InfoPropertyGroup(PropertyGroup):
     drawing = Draw()
-    do_update = bpy.props.BoolProperty(default=True)
+    do_update = BoolProperty(default=True)
 
     retopology_text = "After you have a high resolution model, you need to create a lower resolution one that mimics its shape." \
                 "\n\nYou do this by creating a new topology that adapts to the high resolution model's shape using snapping tools, " \
@@ -154,85 +157,85 @@ class InfoPropertyGroup(bpy.types.PropertyGroup):
         else:
             self.drawing.hide_info(context)
 
-    retopology = bpy.props.BoolProperty(default=False,
+    retopology = BoolProperty(default=False,
         description=retopology_text,
         update=lambda self, context: self.update(context, "retopology"))
-    optimization = bpy.props.BoolProperty(default=False,
+    optimization = BoolProperty(default=False,
         description=optimization_text,
         update=lambda self, context: self.update(context, "optimization"))
-    smoothing_sharpening = bpy.props.BoolProperty(default=False,
+    smoothing_sharpening = BoolProperty(default=False,
         description=smooth_sharp_text,
         update=lambda self, context: self.update(context, "smoothing_sharpening"))
-    uvs = bpy.props.BoolProperty(default=False,
+    uvs = BoolProperty(default=False,
         description=uvs_text,
         update=lambda self, context: self.update(context, "uvs"))
-    model_preparation = bpy.props.BoolProperty(default=False,
+    model_preparation = BoolProperty(default=False,
         description=model_prep_text,
         update=lambda self, context: self.update(context, "model_preparation"))
-    bake_sets_creation = bpy.props.BoolProperty(default=False,
+    bake_sets_creation = BoolProperty(default=False,
         description=bake_sets_creation_text,
         update=lambda self, context: self.update(context, "bake_sets_creation"))
 
 #Scene
-class ScnJetPropertyGroup(bpy.types.PropertyGroup):
-    list_low_res = bpy.props.PointerProperty(type=LowObjListPropertyGroup)
+class ScnJetPropertyGroup(PropertyGroup):
+    list_low_res = PointerProperty(type=LowObjListPropertyGroup)
 
-    high_res_file = bpy.props.StringProperty(name="", default="")
-    optimized_res_file = bpy.props.StringProperty(name="", default="", subtype="FILE_PATH")
+    high_res_file = StringProperty(name="", default="")
+    optimized_res_file = StringProperty(name="", default="", subtype="FILE_PATH")
 
-    opt_high_objs = bpy.props.CollectionProperty(type=ObjectPropertyGroup)
-    opt_meshes = bpy.props.CollectionProperty(type=MeshPropertyGroup)
-    high_meshes = bpy.props.CollectionProperty(type=MeshPropertyGroup)
+    opt_high_objs = CollectionProperty(type=ObjectPropertyGroup)
+    opt_meshes = CollectionProperty(type=MeshPropertyGroup)
+    high_meshes = CollectionProperty(type=MeshPropertyGroup)
 
-    high_res = bpy.props.BoolProperty(options={'HIDDEN'}, default=False)
+    high_res = BoolProperty(options={'HIDDEN'}, default=False)
 
-    tag = bpy.props.PointerProperty(type=TagEdgePropertyGroup)
+    tag = PointerProperty(type=TagEdgePropertyGroup)
 
-    autosmooth = bpy.props.IntProperty(default=180, max=180, min=0)
+    autosmooth = IntProperty(default=180, max=180, min=0)
 
-    decimate_ratio = bpy.props.IntProperty(default=10, max=100, min=0)
+    decimate_ratio = IntProperty(default=10, max=100, min=0)
 
-    subdivisions = bpy.props.IntProperty(default=2, max=10, min=0)
+    subdivisions = IntProperty(default=2, max=10, min=0)
 
-    snap = bpy.props.PointerProperty(type=SnapPropertyGroup)
+    snap = PointerProperty(type=SnapPropertyGroup)
 
-    swap = bpy.props.PointerProperty(type=SwapPropertyGroup)
+    swap = PointerProperty(type=SwapPropertyGroup)
 
-    info = bpy.props.PointerProperty(type=InfoPropertyGroup)
+    info = PointerProperty(type=InfoPropertyGroup)
 
 #Object
-class ObjJetPropertyGroup(bpy.types.PropertyGroup):
-    list_high_res = bpy.props.PointerProperty(type=HiObjListPropertyGroup)
+class ObjJetPropertyGroup(PropertyGroup):
+    list_high_res = PointerProperty(type=HiObjListPropertyGroup)
 
-    opt_mesh = bpy.props.PointerProperty(type=bpy.types.Mesh)
-    high_mesh = bpy.props.PointerProperty(type=bpy.types.Mesh)
+    opt_mesh = PointerProperty(type=Mesh)
+    high_mesh = PointerProperty(type=Mesh)
 
 def register():
-    bpy.utils.register_class(SnapPropertyGroup)
-    bpy.utils.register_class(InfoPropertyGroup)
-    bpy.utils.register_class(SwapPropertyGroup)
-    bpy.utils.register_class(TagEdgePropertyGroup)
-    bpy.utils.register_class(MeshPropertyGroup)
-    bpy.utils.register_class(ObjectPropertyGroup)
-    bpy.utils.register_class(ObjIdPropertyGroup)
-    bpy.utils.register_class(ObjJetPropertyGroup)
-    bpy.utils.register_class(ScnJetPropertyGroup)
+    register_class(SnapPropertyGroup)
+    register_class(InfoPropertyGroup)
+    register_class(SwapPropertyGroup)
+    register_class(TagEdgePropertyGroup)
+    register_class(MeshPropertyGroup)
+    register_class(ObjectPropertyGroup)
+    register_class(ObjIdPropertyGroup)
+    register_class(ObjJetPropertyGroup)
+    register_class(ScnJetPropertyGroup)
 
-    bpy.types.Scene.Jet = bpy.props.PointerProperty(options={'HIDDEN'}, type=ScnJetPropertyGroup)
-    bpy.types.Object.Jet = bpy.props.PointerProperty(options={'HIDDEN'}, type=ObjJetPropertyGroup)
+    Scene.Jet = PointerProperty(options={'HIDDEN'}, type=ScnJetPropertyGroup)
+    Object.Jet = PointerProperty(options={'HIDDEN'}, type=ObjJetPropertyGroup)
 
 def unregister():
-    del bpy.types.Scene.Jet
-    del bpy.types.Object.Jet
+    del Scene.Jet
+    del Object.Jet
 
-    bpy.utils.unregister_class(ScnJetPropertyGroup)
-    bpy.utils.unregister_class(ObjJetPropertyGroup)
-    bpy.utils.unregister_class(ObjIdPropertyGroup)
-    bpy.utils.unregister_class(MeshPropertyGroup)
-    bpy.utils.unregister_class(ObjectPropertyGroup)
-    bpy.utils.unregister_class(TagEdgePropertyGroup)
-    bpy.utils.unregister_class(SwapPropertyGroup)
-    bpy.utils.unregister_class(InfoPropertyGroup)
-    bpy.utils.unregister_class(SnapPropertyGroup)
+    unregister_class(ScnJetPropertyGroup)
+    unregister_class(ObjJetPropertyGroup)
+    unregister_class(ObjIdPropertyGroup)
+    unregister_class(MeshPropertyGroup)
+    unregister_class(ObjectPropertyGroup)
+    unregister_class(TagEdgePropertyGroup)
+    unregister_class(SwapPropertyGroup)
+    unregister_class(InfoPropertyGroup)
+    unregister_class(SnapPropertyGroup)
 
 
