@@ -97,7 +97,8 @@ def jet_load_post(param):
     context = bpy.context
     scene = context.scene
     scene.Jet.active.object = context.active_object
-    scene.Jet.active.object.select = context.active_object.select
+    if context.active_object is not None and hasattr(context.active_object, "select"):
+        scene.Jet.active.object.select = context.active_object.select
 
     if len(scene.Jet.list_low_res.obj_list)>0:
         bpy.ops.wm.jet_modal_timer_op()
