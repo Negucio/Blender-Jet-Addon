@@ -58,7 +58,7 @@ class DATA_OT_jet_low_res_list_remove(Operator):
     def execute(self, context):
         low_res = context.scene.Jet.list_low_res
         idx = low_res.obj_list_index
-        high_res = low_res.obj_list[idx].object.Jet.list_high_res
+        high_res = low_res.obj_list[idx].list_high_res
         high_res.obj_list_index = 0
         high_res.obj_list.clear()
 

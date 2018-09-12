@@ -66,11 +66,13 @@ class VIEW3D_PT_jet_step6(bpy.types.Panel):
         low_res = context.scene.Jet.list_low_res
         self.draw_list(low_res, "low_res", layout, tuple_buttons=(True, False, True, True))
 
-        if len(low_res.obj_list) > 0:
+        items = len(low_res.obj_list)
+        idx = low_res.obj_list_index
+        if items > 0:
             layout.prop(low_res, "select_hi_rest_list", "Select Hi-Res automatically", icon="TRIA_DOWN")
-            idx = low_res.obj_list_index
+            idx = idx if idx < items else 0
 
-            hi_res = low_res.obj_list[idx].object.Jet.list_high_res
+            hi_res = low_res.obj_list[idx].list_high_res
             self.draw_list(hi_res, "hi_res", layout, tuple_buttons=(True, False, True, True))
 
 

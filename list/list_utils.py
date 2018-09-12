@@ -2,8 +2,10 @@ import bpy
 
 def get_hi_res_prop(context):
     low_res = context.scene.Jet.list_low_res
+    items = len(low_res.obj_list)
     idx = low_res.obj_list_index
-    return low_res.obj_list[idx].object.Jet.list_high_res
+    idx = idx if idx < items else 0
+    return low_res.obj_list[idx].list_high_res
 
 def check_selected_objs(context):
     # Enabled when, at least, one mesh object is selected

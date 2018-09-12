@@ -199,6 +199,8 @@ class ScnJetPropertyGroup(PropertyGroup):
     decimate_ratio = IntProperty(default=10, max=100, min=0)
     subdivisions = IntProperty(default=2, max=10, min=0)
 
+    mesh_objs = IntProperty(default=0)
+
     tag = PointerProperty(type=TagEdgePropertyGroup)
     snap = PointerProperty(type=SnapPropertyGroup)
     swap = PointerProperty(type=SwapPropertyGroup)
@@ -207,8 +209,6 @@ class ScnJetPropertyGroup(PropertyGroup):
 
 #Object
 class ObjJetPropertyGroup(PropertyGroup):
-    list_high_res = PointerProperty(type=HiObjListPropertyGroup)
-
     opt_mesh = PointerProperty(type=Mesh)
     high_mesh = PointerProperty(type=Mesh)
 
