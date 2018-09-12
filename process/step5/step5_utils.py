@@ -1,4 +1,4 @@
-import bpy, os
+import bpy
 from ... common_utils import select_obj_exclusive
 
 def apply_modifiers(obj):
@@ -123,3 +123,13 @@ def apply_decimate(obj):
     for mod in obj.modifiers:
         if mod.type == 'DECIMATE':
             bpy.ops.object.modifier_apply(modifier=mod.name)
+
+def set_decimate_geometry(obj, ratio=0.1):
+    if obj is None or obj.type != "MESH": return None
+    select_obj_exclusive(obj, edit_mode=True)
+
+    bpy.ops.mesh.select_all(action="SELECT")
+    bpy.ops.mesh.decimate(ratio=ratio)
+
+    bpy.ops.object.mode_set(mode="OBJECT")
+

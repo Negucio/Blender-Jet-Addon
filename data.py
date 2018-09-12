@@ -187,7 +187,7 @@ class ScnJetPropertyGroup(PropertyGroup):
     list_low_res = PointerProperty(type=LowObjListPropertyGroup)
 
     high_res_file = StringProperty(name="", default="")
-    optimized_res_file = StringProperty(name="", default="", subtype="FILE_PATH")
+    optimized_res_file = StringProperty(name="", default="")
 
     opt_high_objs = CollectionProperty(type=ObjectPropertyGroup)
     opt_meshes = CollectionProperty(type=MeshPropertyGroup)

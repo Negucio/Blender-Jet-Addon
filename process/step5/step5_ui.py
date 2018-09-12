@@ -1,7 +1,7 @@
 import bpy
 import os.path
-from .step5_utils import apply_modifiers, remove_parent, append, apply_decimate, assign_decimate, assign_subsurf, \
-    apply_transform_constraints
+from .step5_utils import apply_modifiers, remove_parent, append, assign_subsurf, \
+    apply_transform_constraints, set_decimate_geometry
 from ... common_utils import apply_to_selected
 
 from bpy_extras.io_utils import ImportHelper
@@ -39,8 +39,6 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         row = col.row(align=True)
         row.prop(context.scene.Jet, "decimate_ratio", text="Decimate Ratio")
         row.operator("jet_assign_decimate.btn", text="", icon="RIGHTARROW").ratio = context.scene.Jet.decimate_ratio
-        row = col.row(align=True)
-        row.operator("jet_apply_decimate.btn", text="Apply Decimate")
 
         col = layout.column(align=True)
         col.operator("jet_apply_transf_constraints.btn", text="Apply Transf & Constraints")
@@ -108,7 +106,7 @@ class VIEW3D_OT_jet_remove_parent(bpy.types.Operator):
         apply_to_selected(context, remove_parent)
         return {'FINISHED'}
 
-class VIEW3D_OT_jet_assign_decimate(bpy.types.Operator):
+class VIEW3D_OT_jet_set_decimate(bpy.types.Operator):
     bl_idname = "jet_assign_decimate.btn"
     bl_label = "Assign decimate"
     bl_description = "Assign decimate and/or set the ratio in all selected objects"
@@ -120,7 +118,7 @@ class VIEW3D_OT_jet_assign_decimate(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        apply_to_selected(context, assign_decimate, value=self.ratio/100)
+        apply_to_selected(context, set_decimate_geometry, value=self.ratio/100)
         return {'FINISHED'}
 
 
@@ -137,16 +135,6 @@ class VIEW3D_OT_jet_assign_subsurf(bpy.types.Operator):
 
     def execute(self, context):
         apply_to_selected(context, assign_subsurf, value=self.subdiv)
-        return {'FINISHED'}
-
-
-class VIEW3D_OT_jet_apply_decimate(bpy.types.Operator):
-    bl_idname = "jet_apply_decimate.btn"
-    bl_label = "Apply Decimate"
-    bl_description = "Apply Decimate modifier in all selected objects"
-
-    def execute(self, context):
-        apply_to_selected(context, apply_decimate)
         return {'FINISHED'}
 
 
