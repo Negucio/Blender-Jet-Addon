@@ -6,7 +6,7 @@ from . list.list_data import HiObjListPropertyGroup, LowObjListPropertyGroup
 from . draw import Draw
 from bpy.props import StringProperty, PointerProperty, BoolProperty, \
                       IntProperty, EnumProperty, CollectionProperty
-from bpy.types import PropertyGroup, Object, Mesh, Scene
+from bpy.types import PropertyGroup, Object, Mesh, Scene, WindowManager
 from bpy.utils import register_class, unregister_class
 
 class ObjIdPropertyGroup(PropertyGroup):
@@ -195,20 +195,14 @@ class ScnJetPropertyGroup(PropertyGroup):
 
     high_res = BoolProperty(options={'HIDDEN'}, default=False)
 
-    tag = PointerProperty(type=TagEdgePropertyGroup)
-
     autosmooth = IntProperty(default=180, max=180, min=0)
-
     decimate_ratio = IntProperty(default=10, max=100, min=0)
-
     subdivisions = IntProperty(default=2, max=10, min=0)
 
+    tag = PointerProperty(type=TagEdgePropertyGroup)
     snap = PointerProperty(type=SnapPropertyGroup)
-
     swap = PointerProperty(type=SwapPropertyGroup)
-
     info = PointerProperty(type=InfoPropertyGroup)
-
     active = PointerProperty(type=ActivePropertyGroup)
 
 #Object
@@ -218,7 +212,11 @@ class ObjJetPropertyGroup(PropertyGroup):
     opt_mesh = PointerProperty(type=Mesh)
     high_mesh = PointerProperty(type=Mesh)
 
+class WMJetPropertyGroup(PropertyGroup):
+    timer = BoolProperty(default=False)
+
 def register():
+    register_class(WMJetPropertyGroup)
     register_class(SnapPropertyGroup)
     register_class(InfoPropertyGroup)
     register_class(SwapPropertyGroup)
@@ -232,6 +230,7 @@ def register():
 
     Scene.Jet = PointerProperty(options={'HIDDEN'}, type=ScnJetPropertyGroup)
     Object.Jet = PointerProperty(options={'HIDDEN'}, type=ObjJetPropertyGroup)
+    WindowManager.Jet = PointerProperty(options={'HIDDEN'}, type=WMJetPropertyGroup)
 
 def unregister():
     del Scene.Jet
@@ -247,5 +246,6 @@ def unregister():
     unregister_class(SwapPropertyGroup)
     unregister_class(InfoPropertyGroup)
     unregister_class(SnapPropertyGroup)
+    unregister_class(WMJetPropertyGroup)
 
 

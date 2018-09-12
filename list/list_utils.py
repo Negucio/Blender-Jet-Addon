@@ -26,13 +26,16 @@ def add_objs(prop, context):
 
         add_obj_to_list(prop, obj)
 
+    if len(prop.obj_list)==1:
+        prop.obj_list_index = 0
+
 
 def remove_obj(prop):
     # Index of the selected item in the list
     obj_idx = prop.obj_list_index
 
     new_idx = 0 if obj_idx < 1 else obj_idx-1
-    prop.obj_list_index_out = new_idx
+    prop.obj_list_index = new_idx
 
     # The selected item is removed from the list
     prop.obj_list.remove(obj_idx)

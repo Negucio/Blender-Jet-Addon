@@ -11,7 +11,19 @@ class JetModalTimerOp(bpy.types.Operator):
 
     _timer = None
 
-    sel_objs = []
+    def manage_selection(self, context):
+        if context.active_object is None or not hasattr(context.active_object, "select"):
+            return
+        if context.active_object != context.scene.Jet.active.object or \
+                context.active_object.select != context.scene.Jet.active.select:
+            if context.active_object.select:
+                objs_in_list = [o.object
+                                for o in context.scene.Jet.list_low_res.obj_list]
+                if context.active_object in objs_in_list:
+                    idx = objs_in_list.index(context.active_object)
+                    context.scene.Jet.list_low_res.obj_list_index_out = idx
+                context.scene.Jet.active.object = context.active_object
+            context.scene.Jet.active.select = context.active_object.select
 
     def modal(self, context, event):
         if len(context.scene.Jet.list_low_res.obj_list)==0:
@@ -19,40 +31,22 @@ class JetModalTimerOp(bpy.types.Operator):
             return {'CANCELLED'}
 
         if event.type == 'TIMER':
-            if context.active_object != context.scene.Jet.active.object or \
-                context.active_object.select != context.scene.Jet.active.select:
-                if context.active_object.select:
-                    objs_in_list = [o.object
-                                    for o in context.scene.Jet.list_low_res.obj_list]
-                    if context.active_object in objs_in_list:
-                        idx = objs_in_list.index(context.active_object)
-                        context.scene.Jet.list_low_res.obj_list_index_out = idx
-                    context.scene.Jet.active.object = context.active_object
-                context.scene.Jet.active.select = context.active_object.select
-
-            #if context.scene.Jet.list_low_res.select_hi_rest_list:
-            #    if self.sel_objs != context.selected_objects:
-            #        print(str(self.sel_objs))
-            #        sel_objs_in_list = [o.object
-            #                        for o in context.scene.Jet.list_low_res.obj_list
-            #                        if o.object in context.selected_objects]
-            #        for obj in sel_objs_in_list:
-            #            for hi_obj in obj.Jet.list_high_res.obj_list:
-            #                hi_obj.object.select = True
-            #
-            #        self.sel_objs = context.selected_objects
-
+            self.manage_selection(context)
         return {'PASS_THROUGH'}
 
     def execute(self, context):
         wm = context.window_manager
         self._timer = wm.event_timer_add(0.1, context.window)
         wm.modal_handler_add(self)
+        wm.Jet.timer = True
         return {'RUNNING_MODAL'}
 
     def cancel(self, context):
         wm = context.window_manager
         wm.event_timer_remove(self._timer)
+        self._timer = None
+        wm.Jet.timer = False
+
 
 @persistent
 def jet_load_post(param):

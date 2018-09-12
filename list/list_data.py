@@ -32,7 +32,9 @@ class LowObjListPropertyGroup(PropertyGroup):
     def update(self, context):
         if len(self.obj_list) == 0:
             return
-        bpy.ops.wm.jet_modal_timer_op()
+        wm = context.window_manager
+        if not wm.Jet.timer:
+            bpy.ops.wm.jet_modal_timer_op()
         obj = self.obj_list[self.obj_list_index].object
         # Select the object
         # Different behaviour depending on where the variable has been updated from
