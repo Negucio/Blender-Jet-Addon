@@ -194,6 +194,7 @@ class ScnJetPropertyGroup(PropertyGroup):
     high_meshes = CollectionProperty(type=MeshPropertyGroup)
 
     high_res = BoolProperty(options={'HIDDEN'}, default=False)
+    remove_subsurf = BoolProperty(options={'HIDDEN'}, default=True)
 
     autosmooth = IntProperty(default=180, max=180, min=0)
     decimate_ratio = IntProperty(default=10, max=100, min=0)

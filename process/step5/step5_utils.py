@@ -1,18 +1,19 @@
 import bpy
 from ... common_utils import select_obj_exclusive
 
-def apply_modifiers(obj):
+def apply_modifiers(obj, remove_subsurf_if_last=True):
     if not hasattr(obj, "modifiers"): return None
     select_obj_exclusive(obj)
     for mod in obj.modifiers:
         try:
-            bpy.ops.object.modifier_apply(modifier = mod.name)
+            if remove_subsurf_if_last and \
+               len(obj.modifiers)==1 and \
+               mod.type=='SUBSURF':
+                bpy.ops.object.modifier_remove(modifier=mod.name)
+            else:
+                bpy.ops.object.modifier_apply(modifier=mod.name)
         except: #If the modifier is disabled can not be applied and Blender throws an error
-            continue
-
-def remove_parent(obj):
-    if not hasattr(obj, "parent"): return None
-    obj.parent = None
+            bpy.ops.object.modifier_remove(modifier=mod.name)
 
 def append(context, optimized, high):
     append_meshes(optimized, collection=context.scene.Jet.opt_meshes, link=True)
@@ -93,8 +94,14 @@ def assign_subsurf(obj, subs=2):
 def apply_transform_constraints(obj):
     if obj is None or obj.type != "MESH": return None
     select_obj_exclusive(obj)
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    bpy.ops.object.visual_transform_apply()
+    for c in reversed(obj.constraints):
+        obj.constraints.remove(c)
 
+def clear_parent_transform(obj):
+    if obj is None or obj.type != "MESH": return None
+    select_obj_exclusive(obj)
+    bpy.ops.object.parent_clear(type='CLEAR_KEEP_TRANSFORM')
 
 def assign_decimate(obj, ratio=0.1):
     if obj is None or obj.type != "MESH": return None

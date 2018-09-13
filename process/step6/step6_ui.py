@@ -78,3 +78,18 @@ class VIEW3D_PT_jet_step6(bpy.types.Panel):
 
 #Operators
 
+#col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
+#col.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
+#class VIEW3D_OT_jet_add_sufix(bpy.types.Operator):
+#    bl_idname = "jet_add_sufix.btn"
+#    bl_label = "Add sufix"
+#    bl_description = "Add sufix to the selected objects"
+#
+#    sufix = bpy.props.StringProperty(name="sufix",default="_Low")
+#
+#    def execute(self, context):
+#        for obj in context.selected_objects:
+#            if self.sufix in obj.name: continue
+#            obj.name = obj.name + self.sufix
+#        return {'FINISHED'}
+

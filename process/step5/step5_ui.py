@@ -1,6 +1,6 @@
 import bpy
 import os.path
-from .step5_utils import apply_modifiers, remove_parent, append, assign_subsurf, \
+from .step5_utils import apply_modifiers, clear_parent_transform, append, assign_subsurf, \
     apply_transform_constraints, set_decimate_geometry
 from ... common_utils import apply_to_selected
 
@@ -33,17 +33,18 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         row.operator("jet_assign_subsurf.btn", text="", icon="RIGHTARROW").subdiv = context.scene.Jet.subdivisions
 
         col = layout.column(align=True)
-        col.operator("jet_apply_modifiers.btn", text="Apply Modifiers")
+        col.operator("jet_apply_modifiers.btn", text="Apply Modifiers").remove_subsurf = context.scene.Jet.remove_subsurf
+        col.prop(context.scene.Jet, "remove_subsurf", text="Remove Subsurf if last modifier", toggle=True)
 
         col = layout.column(align=True)
         row = col.row(align=True)
         row.prop(context.scene.Jet, "decimate_ratio", text="Decimate Ratio")
-        row.operator("jet_assign_decimate.btn", text="", icon="RIGHTARROW").ratio = context.scene.Jet.decimate_ratio
+        row.operator("jet_set_decimate.btn", text="", icon="RIGHTARROW").ratio = context.scene.Jet.decimate_ratio
 
         col = layout.column(align=True)
-        col.operator("jet_apply_transf_constraints.btn", text="Apply Transf & Constraints")
+        col.operator("jet_apply_transf_constraints.btn", text="Apply Visual Transform")
         col = layout.column(align=True)
-        col.operator("jet_remove_parent.btn", text="Remove Parent")
+        col.operator("jet_clear_parent_transf.btn", text="Clear Parent with Transform")
 
         col = layout.column(align=True)
         row = col.row(align=True)
@@ -61,7 +62,6 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
         op.optimized = context.scene.Jet.optimized_res_file
         op.high = context.scene.Jet.high_res_file
 
-        #col.operator("jet_switch_hi_opt.btn", text="Swap Optimized / High Resolution")
         row = layout.row(align=True)
         row.enabled = hi and proxy
         row.prop(context.scene.Jet.swap, "model", expand=True)
@@ -70,8 +70,8 @@ class VIEW3D_PT_jet_step5(bpy.types.Panel):
 #Operators
 class VIEW3D_OT_jet_append_opt_high(bpy.types.Operator):
     bl_idname = "jet_append_opt_high.btn"
-    bl_label = ""
-    bl_description = ""
+    bl_label = "Bring proxy and hi-res models to scene"
+    bl_description = "Bring proxy and hi-res models to scene"
 
     optimized = bpy.props.StringProperty(default='')
     high = bpy.props.StringProperty(default='')
@@ -92,24 +92,26 @@ class VIEW3D_OT_jet_apply_modifiers(bpy.types.Operator):
     bl_label = "Apply Modifiers"
     bl_description = "Apply modifiers to selected objects"
 
+    remove_subsurf = bpy.props.BoolProperty(default=True)
+
     def execute(self, context):
-        apply_to_selected(context, apply_modifiers)
+        apply_to_selected(context, apply_modifiers, value=self.remove_subsurf)
         return {'FINISHED'}
 
 
-class VIEW3D_OT_jet_remove_parent(bpy.types.Operator):
-    bl_idname = "jet_remove_parent.btn"
-    bl_label = "Remove parents"
-    bl_description = "Remove parent to selected objects"
+class VIEW3D_OT_jet_clear_parent_transform(bpy.types.Operator):
+    bl_idname = "jet_clear_parent_transf.btn"
+    bl_label = "Clear parent with transform"
+    bl_description = "Clear parent with transform in all selected objects"
 
     def execute(self, context):
-        apply_to_selected(context, remove_parent)
+        apply_to_selected(context, clear_parent_transform)
         return {'FINISHED'}
 
 class VIEW3D_OT_jet_set_decimate(bpy.types.Operator):
-    bl_idname = "jet_assign_decimate.btn"
-    bl_label = "Assign decimate"
-    bl_description = "Assign decimate and/or set the ratio in all selected objects"
+    bl_idname = "jet_set_decimate.btn"
+    bl_label = "Set Decimate Geometry"
+    bl_description = "Set Decimate Geometry command with the customized ratio to all selected objects"
 
     ratio = bpy.props.IntProperty(default=10)
 
@@ -125,7 +127,8 @@ class VIEW3D_OT_jet_set_decimate(bpy.types.Operator):
 class VIEW3D_OT_jet_assign_subsurf(bpy.types.Operator):
     bl_idname = "jet_assign_subsurf.btn"
     bl_label = "Assign subsurf"
-    bl_description = "Assign subsurf and/or set the subdivisions in all selected objects"
+    bl_description = "Assign subsurf and set the subdivisions to all selected objects" \
+                     "\nThe subdivisions will be applied to the last subsurf in the modifier stack"
 
     subdiv = bpy.props.IntProperty(default=2)
 
@@ -140,8 +143,8 @@ class VIEW3D_OT_jet_assign_subsurf(bpy.types.Operator):
 
 class VIEW3D_OT_jet_apply_transf_constraints(bpy.types.Operator):
     bl_idname = "jet_apply_transf_constraints.btn"
-    bl_label = "Apply Transform and Constraints"
-    bl_description = "Apply Transform and Constraints in all selected objects"
+    bl_label = "Apply Visual Transform and Constraints"
+    bl_description = "Apply Visual Transform and remove constraints to all selected objects"
 
     def execute(self, context):
         apply_to_selected(context, apply_transform_constraints)
@@ -165,18 +168,3 @@ class VIEW3D_OT_jet_load_blend_file(Operator, ImportHelper):
     def execute(self, context):
         setattr(context.scene.Jet, self.attr, self.filepath)
         return {'FINISHED'}
-
-#col.operator("jet_add_sufix.btn", text="Add Sufix '_Low'").sufix = "_Low"
-#col.operator("jet_add_sufix.btn", text="Add Sufix '_High'").sufix = "_High"
-#class VIEW3D_OT_jet_add_sufix(bpy.types.Operator):
-#    bl_idname = "jet_add_sufix.btn"
-#    bl_label = "Add sufix"
-#    bl_description = "Add sufix to the selected objects"
-#
-#    sufix = bpy.props.StringProperty(name="sufix",default="_Low")
-#
-#    def execute(self, context):
-#        for obj in context.selected_objects:
-#            if self.sufix in obj.name: continue
-#            obj.name = obj.name + self.sufix
-#        return {'FINISHED'}
