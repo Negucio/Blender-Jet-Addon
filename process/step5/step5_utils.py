@@ -42,7 +42,7 @@ def append_meshes(blendfile, collection=None, link=False, fake_user=False):
     for m in bpy.data.meshes:
         cond = m.name in imported
         if link:
-            cond = cond and (blendfile == m.library.filepath)
+            cond = cond and (hasattr(m, "library")) and (m.library is not None) and (blendfile == m.library.filepath)
         if cond:
             if fake_user:
                 m.use_fake_user = True

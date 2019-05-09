@@ -1,10 +1,10 @@
 
 bl_info = {
     "name": "Jet",
-    "author": "",
+    "author": "Oliver Villar <oliver@blendtuts.com>, Roberto Noya <negucio@gmail.com>",
     "description": "",
-    "version": (0, 2, 0),
-    "blender": (2, 7, 8),
+    "version": (0, 2, 1),
+    "blender": (2, 7, 9),
     "location": "",
     "warning": "",
     "wiki_url": "",
